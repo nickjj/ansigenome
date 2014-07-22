@@ -15,7 +15,7 @@ setup(name="ansigenome",
       author="Nick Janetakis",
       author_email="nick.janetakis@gmail.com",
       url="https://github.com/nickjj/ansigenome",
-      description="A tool to help you gather information and " + \
+      description="A tool to help you gather information and " +
       "manage your Ansible roles.",
       license="GPLv3",
       install_requires=["jinja2", "PyYAML", "setuptools"],
