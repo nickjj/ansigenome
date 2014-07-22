@@ -1,4 +1,4 @@
-|PyPI version| |Build status|
+|PyPI version| |PyPI downloads| |Build status|
 
 Ansigenome
 ==========
@@ -227,6 +227,8 @@ Ansigenome was created by Nick Janetakis nick.janetakis@gmail.com.
 Special thanks to `@drybjed <https://github.com/drybjed>`_ for coming up with the name of the tool. This project idea spawned from trying to break up his `ginas project <https://github.com/ginas/ginas>`_ into multiple roles. Neither of us wanted to manually make 50 repos and 50 readmes so I decided to learn Python and make this tool instead.
 
 .. |PyPI version| image:: https://badge.fury.io/py/ansigenome.png
+   :target: https://pypi.python.org/pypi/ansigenome
+.. |PyPI downloads| image:: https://pypip.in/d/ansigenome/badge.png
    :target: https://pypi.python.org/pypi/ansigenome
 .. |Build status| image:: https://secure.travis-ci.org/nickjj/ansigenome.png
    :target: https://travis-ci.org/nickjj/ansigenome
