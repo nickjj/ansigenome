@@ -98,3 +98,7 @@ If you want to make a list of roles to feed to `ansible-galaxy install` then...
 There's really nothing like this provided by ansible-galaxy or any of Ansible's command line tools. Dump will gather a bunch of stats for each role and dump them to json.
 
 Now you can build a pretty web based front end to display your role's stats. You could even use 1 of many javascript graphing libraries to make it look amazing. This has really strong potential IMO.
+
+## Install Ansigenome
+
+Interested in trying it? Check the [readme](https://github.com/nickjj/ansigenome#installation) to install it.
