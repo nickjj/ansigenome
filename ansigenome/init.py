@@ -78,7 +78,7 @@ class Init(object):
                 utils.string_to_file(os.path.join(create_folder_path,
                                                   "main.yml"),
                                      default_mainyml_template.replace(
-                                     "%values", folder))
+                                         "%values", folder))
 
     def create_tests(self):
         """
