@@ -17,6 +17,9 @@ A screenshot speaks a thousand words:
 .. figure:: https://raw.githubusercontent.com/nickjj/ansigenome/master/docs/ansigenome.png
    :alt: Ansigen screenshot
 
+
+Read the `benefits guide`_ to learn why you might want to use Ansigenome.
+
 Installation
 ============
 
@@ -227,4 +230,5 @@ Special thanks to `@drybjed <https://github.com/drybjed>`_ for coming up with th
    :target: https://pypi.python.org/pypi/ansigenome
 .. |Build status| image:: https://secure.travis-ci.org/nickjj/ansigenome.png
    :target: https://travis-ci.org/nickjj/ansigenome
+.. _benefits guide: https://github.com/nickjj/ansigenome/blob/master/docs/benefits.md
 .. _Here's a gist: https://gist.github.com/nickjj/0638b5f0839176bc6b37
