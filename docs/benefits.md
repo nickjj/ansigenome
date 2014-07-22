@@ -16,29 +16,29 @@ Currently the `ansible-galaxy init` command dumps out a readme which expects the
 
 ### Default variables
 
-**Without Ansignome**: You will have to goto your `defaults/main.yml` file and copy it to your readme every time you make a change. I hope you don't forget to update your readme too often because I know I've forgotten many times. Also who wants to copy/paste massive chunks of code? Not this guys!
+**Without Ansigenome**: You will have to goto your `defaults/main.yml` file and copy it to your readme every time you make a change. I hope you don't forget to update your readme too often because I know I've forgotten many times. Also who wants to copy/paste massive chunks of code? Not this guys!
 
-**With Ansigenome**: Sit back and relax, you don't have to do anything at all. When you rebuild a role with Ansignome it scans your `defaults/main.yml` file and injects its contents directly into your readme file. You also have the option of overwriting that functionality by just going to your `meta/main.yml` file and filling out the "defaults" field with something other than an empty string.
+**With Ansigenome**: Sit back and relax, you don't have to do anything at all. When you rebuild a role with Ansigenome it scans your `defaults/main.yml` file and injects its contents directly into your readme file. You also have the option of overwriting that functionality by just going to your `meta/main.yml` file and filling out the "defaults" field with something other than an empty string.
 
 It also automatically picks out all of your facts and lists them out. Like the defaults you can overwrite it by simply putting something in the "facts" field in the meta file.
 
 ### Dependencies
 
-**Without Ansignome**: Yikes, now you need to copy/paste all of your dependencies from your meta file into the readme otherwise people will have no idea what roles your role depends on. It's another spot where you need to copy/paste furiously.
+**Without Ansigenome**: Yikes, now you need to copy/paste all of your dependencies from your meta file into the readme otherwise people will have no idea what roles your role depends on. It's another spot where you need to copy/paste furiously.
 
-**With Ansignome**: No worries dude/dudette. You don't have to do anything. Ansigenome scans your meta file and injects the dependencies into the readme in the form of a list.
+**With Ansigenome**: No worries dude/dudette. You don't have to do anything. Ansigenome scans your meta file and injects the dependencies into the readme in the form of a list.
 
 ### Example playbook
 
-**Without Ansignome**: You'll likely enter in a sample playbook which is cool, but how do I as the end user quickly get started with your role? What's the bare minimum to get rolling? That's what I care about the most.
+**Without Ansigenome**: You'll likely enter in a sample playbook which is cool, but how do I as the end user quickly get started with your role? What's the bare minimum to get rolling? That's what I care about the most.
 
 **With Ansigenome**: Just head over to your role's meta file and fill out the inventory field. It expects you to enter the bare minimum code to get rolling in group_vars/all or somewhere else to get your role working. It automatically generates a getting started section in your readme from that.
 
 ### Requirements
 
-**Without Ansignome**: You'll need to copy that huge list of platforms from your meta file into the readme and make sure to always keep it up to date. Ouch.
+**Without Ansigenome**: You'll need to copy that huge list of platforms from your meta file into the readme and make sure to always keep it up to date. Ouch.
 
-**With Ansignome**: Ansignome has your back. It will automatically make a list similar to how it's displayed on the actual ansible galaxy except you don't have to copy/paste anything.
+**With Ansigenome**: Ansignome has your back. It will automatically make a list similar to how it's displayed on the actual ansible galaxy except you don't have to copy/paste anything.
 
 ### As a role user looking to use a public role...
 
@@ -59,7 +59,7 @@ You might not even know how to install the role because his github repo name is 
 
 Good luck wondering if it's idempotent or tested. Not too many people write tests for their roles in a way that's publicly viewable.
 
-**With Ansignome**: Ansigenome addresses every point here and you don't even have to do anything extra. Just make a new role with `ansigenome init` and rebuild it with `ansigenome rebuild` and you everything is covered without doing anything else. You can rebuild existing roles too, don't worry it doesn't modify your roles. Just the meta and readme files.
+**With Ansigenome**: Ansigenome addresses every point here and you don't even have to do anything extra. Just make a new role with `ansigenome init` and rebuild it with `ansigenome rebuild` and you everything is covered without doing anything else. You can rebuild existing roles too, don't worry it doesn't modify your roles. Just the meta and readme files.
 
 ### As an open source role builder...
 
@@ -79,7 +79,7 @@ You never know when you'll want to run an arbitrary command on all of your roles
 
 **Without Ansigenome**: A lot of tedious `git init && git remote add origin https://github.com/yourname/foo.git` calls in each of those 50 directories. Perhaps you're a unix wizard? You may spend 2 to 20 minutes writing a script to do it, that's cool.
 
-**With Ansignome**: `ansigenome run -m 'git init && git remote add origin https://github.com/yourname/%role_name.git`
+**With Ansigenome**: `ansigenome run -m 'git init && git remote add origin https://github.com/yourname/%role_name.git`
 
 `%role_name` is the role name in the current role's directory. This is needed because your git repo name might be different than the actual role name on your file system since it will likely be prefixed with your github username so it works on the galaxy.
 
