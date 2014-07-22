@@ -62,13 +62,13 @@ The help is setup similar to Ansible's command line tools. Your best bet is to j
 
 Example rebuild output
 ^^^^^^^^^^^^^^^^^^^^^^
-`Here's a gist`_ of an example meta file and readme that gets automatically generated. After rebuilding it is expected that you visit each role's meta file and update any relevant information for that role.
+`Here's a gist`_ of an example meta file and readme that was automatically generated. After rebuilding it is expected that you visit each role's meta file and update any relevant information for that role.
 
 Getting the most from rebuild
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-If you plan to rebuild your roles then you should treat the readme file as something you never touch. All of your changes to the readme file should come from the meta file.
+If you plan to rebuild your roles then you should treat the readme file as something you never touch. All of your changes to the readme file must come from the meta file.
 
-You should also provide documentation for your default role variables as comments inside of your `defaults/main.yml` file because that file gets injected directly into the readme as is.
+You should also provide documentation for your default role variables as comments inside of your ``defaults/main.yml`` file because that file gets injected directly into the readme as is unless you overwrite it in the meta file.
 
 Stats gathered
 ==============
