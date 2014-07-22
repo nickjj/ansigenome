@@ -353,7 +353,7 @@ class Scan(object):
             meta_dict["galaxy_info"] = {}
 
         if "platforms" not in meta_dict["galaxy_info"]:
-            meta_dict["galaxy_info"]["platforms"] = {}
+            meta_dict["galaxy_info"]["platforms"] = []
 
         if "dependencies" not in meta_dict:
             meta_dict["dependencies"] = []
@@ -378,14 +378,28 @@ class Scan(object):
             original_meta_dict = self.make_meta_consistent(original_meta_dict)
             self.meta_dict = dict(self.meta_dict.items() +
                                   original_meta_dict.items())
+
+            # make sure certain values are set if they didn't exist previously
+            template_meta_dict = utils.yaml_load("", input=j2_out)
+            galaxy_author = template_meta_dict["galaxy_info"]["author"]
+            galaxy_platforms = template_meta_dict["galaxy_info"]["platforms"]
+            meta_github_url = template_meta_dict["meta_info"]["github_url"]
+
+            if len(self.meta_dict["galaxy_info"]["platforms"]) == 0:
+                self.meta_dict["galaxy_info"]["platforms"] = galaxy_platforms
+
+            if "author" not in self.meta_dict["galaxy_info"]:
+                self.meta_dict["galaxy_info"]["author"] = galaxy_author
+
+            # always renew the github url
+            self.meta_dict["meta_info"]["github_url"] = meta_github_url
         else:
             # otherwise just use what we have
             self.meta_dict = utils.yaml_load("", input=j2_out)
 
         # sort of hacky but works completely fine for now
-        if "platforms" in self.meta_dict["galaxy_info"]:
-            self.meta_dict["galaxy_info"]["platforms"] = utils.to_nice_yaml(
-                self.meta_dict["galaxy_info"]["platforms"])
+        self.meta_dict["galaxy_info"]["platforms"] = utils.to_nice_yaml(
+            self.meta_dict["galaxy_info"]["platforms"])
 
         self.meta_dict["dependencies"] = utils.to_nice_yaml(
             self.meta_dict["dependencies"])
