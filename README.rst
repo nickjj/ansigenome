@@ -60,6 +60,16 @@ The help is setup similar to Ansible's command line tools. Your best bet is to j
 
     'ansigenome command --help' for more information on a specific command
 
+Example rebuild output
+^^^^^^^^^^^^^^^^^^^^^^
+`Here's a gist`_ of an example meta file and readme that gets automatically generated. After rebuilding it is expected that you visit each role's meta file and update any relevant information for that role.
+
+Getting the most from rebuild
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+If you plan to rebuild your roles then you should treat the readme file as something you never touch. All of your changes to the readme file should come from the meta file.
+
+You should also provide documentation for your default role variables as comments inside of your `defaults/main.yml` file because that file gets injected directly into the readme as is.
+
 Stats gathered
 ==============
 
@@ -217,3 +227,4 @@ Special thanks to `@drybjed <https://github.com/drybjed>`_ for coming up with th
    :target: https://pypi.python.org/pypi/ansigenome
 .. |Build status| image:: https://secure.travis-ci.org/nickjj/ansigenome.png
    :target: https://travis-ci.org/nickjj/ansigenome
+.. _Here's a gist: https://gist.github.com/nickjj/0638b5f0839176bc6b37
