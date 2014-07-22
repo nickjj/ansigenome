@@ -1,0 +1,47 @@
+[![Build_Status](https://secure.travis-ci.org/{{ github_username }}/{{ repo_name }}.png)](http://travis-ci.org/{{ github_username }}/{{ repo_name }}) {%if meta_info.galaxy_id is defined and meta_info.galaxy_id%}| [View it on the Ansible galaxy](https://galaxy.ansible.com/list#/roles/{{ meta_info.galaxy_id }}){% endif %}
+
+## What is {{ galaxy_name }}{% if meta_info.synopsis is defined %}
+{{ meta_info.synopsis | trim }}{% endif %}
+
+{% if meta_info.inventory is defined and meta_info.inventory %}
+## Quick start
+
+### Inventory
+{{ meta_info.inventory | trim | indent(4, true) }}{% endif %}
+
+## Installation
+
+{% if galaxy_info.min_ansible_version is defined %}Ansible v{{ galaxy_info.min_ansible_version | trim }}+ {% endif %}`ansible-galaxy install {{ galaxy_name }}`
+{% if dependencies is defined and dependencies -%}
+### Dependencies
+{% for dependency in dependencies %}
+- {{ dependency.role | trim }}{% endfor %}
+
+{% endif %}
+{% if galaxy_info.platforms and galaxy_info.platforms -%}
+
+### Requirements
+{% for platform in galaxy_info.platforms %}
+- **{{ platform.name | trim }}**: {{ platform.versions | join(", ") | trim }}{% endfor %}{% endif %}
+
+## Role variables
+{% if meta_info.defaults is defined and meta_info.defaults %}
+
+### Defaults
+{{ meta_info.defaults | trim | indent(4, true) }}
+{% endif %}
+{% if meta_info.facts is defined and meta_info.facts %}
+
+### Facts
+{{ meta_info.facts | trim | indent(4, true) }}
+{% endif %}
+{% if meta_info.custom is defined and meta_info.custom %}
+
+{{ meta_info.custom | trim }}
+{% endif %}
+{% if galaxy_info.license is defined and galaxy_info.license %}
+
+## License
+{{ galaxy_info.license | trim }}{% endif %}
+
+{% if meta_info.footer is defined and meta_info.footer %}{{ meta_info.footer | trim }}{% endif %}

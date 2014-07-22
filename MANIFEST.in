@@ -1,0 +1,6 @@
+recursive-include templates *
+recursive-include docs *
+include README.rst
+include LICENSE
+include VERSION
+include MANIFEST.in

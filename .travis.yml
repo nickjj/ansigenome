@@ -1,0 +1,19 @@
+---
+language: "python"
+python: "2.7"
+
+before_install:
+  - "pip install setuptools flake8"
+
+install:
+  - "python setup.py develop"
+  - "git config user.email 'foo@bar.com'"
+  - "git config user.name 'Foo Bar'"
+
+before_script:
+  - "mkdir $HOME/.python-eggs"
+  - "chmod og-w $HOME/.python-eggs"
+
+script:
+  - "flake8 ."
+  - "cd test/integration && python -m unittest discover ."

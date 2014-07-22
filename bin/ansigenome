@@ -1,0 +1,214 @@
+#!/usr/bin/env python
+
+import os
+import sys
+
+from optparse import OptionParser
+
+import ansigenome.constants as c
+import ansigenome.ui as ui
+import ansigenome.utils as utils
+
+from ansigenome.export import Export
+from ansigenome.init import Init
+from ansigenome.run import Run
+from ansigenome.scan import Scan
+
+
+def get_action(args):
+    """
+    Get the action the user wants to execute from the
+    sys argv list.
+    """
+    for i in range(0, len(args)):
+        arg = args[i]
+        if arg in c.VALID_ACTIONS:
+            del args[i]
+            return arg
+    return None
+
+
+def get_opt(options, k, defval=""):
+    """
+    Returns an option from an Optparse values instance.
+    """
+    try:
+        data = getattr(options, k)
+    except:
+        return defval
+    if k == "roles_path":
+        if os.pathsep in data:
+            data = data.split(os.pathsep)[0]
+    return data
+
+
+def build_option_parser(action):
+    """
+    Builds an option parser object based on the action
+    the user wants to execute.
+    """
+    usage = ui.usage()
+    epilog = ui.epilogue(os.path.basename(sys.argv[0]))
+
+    OptionParser.format_epilog = lambda self, formatter: self.epilog
+    parser = OptionParser(usage=usage, epilog=epilog)
+
+    if not action:
+        parser.print_help()
+        sys.exit()
+
+    usage_prefix = "Usage: %%prog %s" % action
+
+    if action == "scan":
+        parser.set_usage("{0} [ROLES_PATH]".format(usage_prefix))
+    elif action == "rebuild":
+        parser.set_usage("{0} [ROLES_PATH] -u GITHUB_USERNAME [-r TEMPLATE_README] [-t TEMPLATE_META] [-x REPO_PREFIX]".format(usage_prefix))
+        parser.add_option("-u", "--github-username",
+                          dest="github_username",
+                          help="your github account name")
+        parser.add_option("-r", "--template-readme",
+                          dest="template_readme",
+                          default=c.README_TEMPLATE_PATH,
+                          help="supply a custom readme template path or url")
+        parser.add_option("-t", "--template-meta", dest="template_meta",
+                          default=c.META_TEMPLATE_PATH,
+                          help="supply a custom meta template path or url")
+    elif action == "run":
+        parser.set_usage("{0} [ROLES_PATH] -m COMMAND".format
+                         (usage_prefix))
+        parser.add_option("-m", "--command", dest="command",
+                          help="Execute this shell command on each role")
+    elif action == "init":
+        parser.set_usage("{0} OUT_PATH [-r REPO_NAME]".format(usage_prefix))
+        parser.add_option("-r", "--repo-name", dest="repo_name",
+                          help="replace the role name with the repo name in tests/main.yml if it is different")
+    elif action == "export":
+        parser.set_usage(
+            "{0} [ROLES_PATH] -o OUT_FILE [-x REPO_PREFIX]".format(
+                usage_prefix))
+    elif action == "dump":
+        parser.set_usage("{0} [ROLES_PATH] -o OUT_FILE [-r]".format(usage_prefix))
+        parser.add_option("-r", "--with-readme", dest="with_readme",
+                          action="store_true",
+                          default=False,
+                          help="include the readme file in the dump")
+    if action in ("scan", "rebuild", "run", "dump"):
+        parser.add_option("-l", "--limit", dest="limit",
+                          help="a comma separated list of roles to white list")
+        parser.add_option("-q", "--quiet", dest="quiet",
+                          action="store_true",
+                          help="do not report anything to stdout")
+    if action in ("rebuild",  "export"):
+        parser.add_option("-x", "--repo-prefix", dest="repo_prefix",
+                          default="",
+                          help="a prefix to apply to each role name")
+    if action in ("export", "dump"):
+        parser.add_option("-o", "--out-file", dest="out_file",
+                          help="the output file path")
+    return parser
+
+
+def execute_scan(args, options, parser):
+    """
+    Execute the scan action.
+    """
+    check_roles_path(args, parser)
+    Scan(args, options)
+
+
+def execute_rebuild(args, options, parser):
+    """
+    Execute the rebuild action.
+    """
+    if options.github_username is None:
+        parser.print_help()
+        sys.exit()
+
+    check_roles_path(args, parser)
+    Scan(args, options, rebuild=True)
+
+
+def execute_run(args, options, parser):
+    """
+    Execute the run action.
+    """
+    if options.command is None:
+        parser.print_help()
+        sys.exit()
+
+    check_roles_path(args, parser)
+    Run(args, options)
+
+
+def execute_init(args, options, parser):
+    """
+    Execute the init action.
+    """
+    if len(args) == 0:
+        parser.print_help()
+        sys.exit()
+
+    Init(args, options)
+
+
+def execute_export(args, options, parser):
+    """
+    Execute the export action.
+    """
+    if options.out_file is None:
+        parser.print_help()
+        sys.exit()
+
+    check_roles_path(args, parser)
+    Export(args, options)
+
+
+def execute_dump(args, options, parser):
+    """
+    Execute the dump action.
+    """
+    if options.out_file is None:
+        parser.print_help()
+        sys.exit()
+
+    check_roles_path(args, parser)
+    Scan(args, options, dump=True)
+
+
+def check_roles_path(args, parser):
+    """
+    Use the default role path or the user supplied roles path.
+    """
+    used_default = False
+
+    if len(args) == 0:
+        roles_path = c.ROLES_PATH
+        used_default = True
+    else:
+        roles_path = args[0]
+
+    if not os.path.exists(roles_path):
+        if used_default:
+            ui.error(c.MESSAGES["default_roles_path_missing"])
+            parser.print_help()
+        else:
+            ui.error(c.MESSAGES["path_missing"], roles_path)
+        sys.exit(1)
+
+
+def main():
+    """
+    Main entry point to the application.
+    """
+    action = get_action(sys.argv)
+    parser = build_option_parser(action)
+    (options, args) = parser.parse_args()
+    args = utils.stripped_args(args)
+
+    if 1:
+        fn = globals()["execute_%s" % action]
+        fn(args, options, parser)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,46 @@
+---
+{% if galaxy_info is defined -%}
+galaxy_info:
+  author: "{% if galaxy_info.author %}{{ galaxy_info.author }}{% else %}Your name{% endif %}"
+  description: "{% if galaxy_info.description %}{{ galaxy_info.description }}{% else %}A short description of your role.{% endif %}"
+  company: "{% if galaxy_info.company %}{{ galaxy_info.company }}{% endif %}"
+  license: "{% if galaxy_info.license %}{{ galaxy_info.license }}{% else %}MIT{% endif %}"
+  min_ansible_version: "{% if galaxy_info.min_ansible_version %}{{ galaxy_info.min_ansible_version }}{% else %}1.6{% endif %}"
+
+  platforms:
+{% if galaxy_info.platforms is defined and galaxy_info.platforms %}
+{{ galaxy_info.platforms | indent(4, true) }}
+
+{% else %}
+    - name: Ubuntu
+      versions:
+      - precise
+    - name: Debian
+      versions:
+      - wheezy
+
+{% endif -%}
+{% endif -%}
+
+{% if dependencies is defined and dependencies|length > 3 -%}
+dependencies:
+{{ dependencies | indent(2, true) }}
+
+{% else -%}
+dependencies: []
+
+{% endif -%}
+
+
+{% if meta_info is defined -%}
+meta_info:
+  synopsis: "{% if meta_info.synopsis %}{{ meta_info.synopsis }}{% else %}It is an ansible role that ...{% endif %}"
+  github_url: "{{ meta_info.github_url | default('N/A') }}"
+  git_branch: "{% if meta_info.git_branch %}{{ meta_info.git_branch }}{% else %}master{% endif %}"
+  galaxy_id: "{% if meta_info.galaxy_id %}{{ meta_info.galaxy_id }}{% endif %}"
+  inventory: "{% if meta_info.inventory %}{{ meta_info.inventory }}{% endif %}"
+  defaults: "{% if meta_info.defaults %}{{ meta_info.defaults }}{% endif %}"
+  facts: "{% if meta_info.facts %}{{ meta_info.facts }}{% endif %}"
+  custom: "{% if meta_info.custom %}{{ meta_info.custom }}{% endif %}"
+  footer: "{% if meta_info.footer %}{{ meta_info.footer }}{% endif %}"
+{% endif -%}

@@ -1,0 +1,31 @@
+# Python related paths
+__pycache__/
+*.py[cod]
+.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+eggs/
+parts/
+sdist/
+*.egg-info/
+.installed.cfg
+*.egg
+pip-log.txt
+pip-delete-this-directory.txt
+
+# OS and editor paths
+.DS_Store
+*/**.DS_Store
+._*
+.*.sw*
+*~
+.\#*
+.idea/
+.project
+.pydevproject
+*.iml
+*.sublime-project
+*.sublime-workwspace
