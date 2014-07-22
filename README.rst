@@ -70,42 +70,6 @@ If you plan to rebuild your roles then you should treat the readme file as somet
 
 You should also provide documentation for your default role variables as comments inside of your ``defaults/main.yml`` file because that file gets injected directly into the readme as is unless you overwrite it in the meta file.
 
-Stats gathered
-==============
-
-Here are the stats gathered which could be dumped to json if you wish.
-
-::
-
-    report = {
-        "totals": {
-            "roles": 0,
-            "dependencies" 0,
-            "defaults": 0,
-            "facts": 0,
-            "files": 0,
-            "lines": 0,
-        },
-        "roles": {
-            # All of the stats below get harvested from each role you scan.
-            %role_name: {
-                "total_dependencies": 0
-                "total_defaults": 0,
-                "total_facts": 0,
-                "total_lines": 0,
-                "total_files": 0,
-                "facts": [],
-                "dependencies": {},
-                "defaults": [],
-                "meta": {},
-                "readme": "",
-            }
-        },
-        "stats": {
-            "longest_role_name_length": 0
-        }
-    }
-
 Templates
 =========
 
@@ -203,6 +167,42 @@ Here are all of the values you have access to in the template if you decide to m
 
     # Any extra text you would like to add at the very bottom of the readme.
     meta_info.footer: ""
+
+Stats gathered
+==============
+
+Here are the stats gathered which could be dumped to json if you wish.
+
+::
+
+    report = {
+        "totals": {
+            "roles": 0,
+            "dependencies" 0,
+            "defaults": 0,
+            "facts": 0,
+            "files": 0,
+            "lines": 0,
+        },
+        "roles": {
+            # All of the stats below get harvested from each role you scan.
+            %role_name: {
+                "total_dependencies": 0
+                "total_defaults": 0,
+                "total_facts": 0,
+                "total_lines": 0,
+                "total_files": 0,
+                "facts": [],
+                "dependencies": {},
+                "defaults": [],
+                "meta": {},
+                "readme": "",
+            }
+        },
+        "stats": {
+            "longest_role_name_length": 0
+        }
+    }
 
 Contributing
 ============
