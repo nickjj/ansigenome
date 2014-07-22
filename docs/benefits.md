@@ -91,7 +91,7 @@ If you want to make a list of roles to feed to `ansible-galaxy install` then...
 
 **Without Ansigenome**: You'll either end up with a ton of roles all sent to the command directly or you'll have to manually make a list of roles and save them to a file which can then be sent to the `-r` flag for `ansible-galaxy install`.
 
-**With Ansigneome**: Just point the export command a directory with your roles and pick an output file. You're done. It will also do other things in the future, it's a work in the progress.
+**With Ansigenome**: Just point the export command a directory with your roles and pick an output file. You're done. It will also do other things in the future, it's a work in the progress.
 
 ## `dump`
 
