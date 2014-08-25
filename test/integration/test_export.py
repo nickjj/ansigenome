@@ -19,21 +19,47 @@ class TestExport(unittest.TestCase):
     def tearDown(self):
         th.rmrf(self.test_path)
 
-    def test_export(self):
-        out_path = os.path.join(self.test_path, "Rolefile")
+    def test_yml_export(self):
+        out_dir = os.path.join(self.test_path, "requirements")
+        out_path = os.path.join(out_dir, "requirements.yml")
+
+        role_names = th.create_roles(self.test_path)
+
+        cli_flags = "--yaml -b stable -u me -x ansible-"
+        (out, err) = utils.capture_shell(
+            "ansigenome export {0} -o {1} {2}".format(self.test_path,
+                                                      out_dir,
+                                                      cli_flags))
+
+        self.assertTrue(os.path.exists(out_path))
+
+        requirements = utils.file_to_string(out_path)
+
+        for role in role_names:
+            self.assertIn(role, requirements)
+            self.assertIn("me/ansible-", requirements)
+            self.assertIn("version: 'stable'", requirements)
+
+        self.assertEqual(out, "")
+        self.assertEqual(err, "")
+
+    def test_txt_export(self):
+        out_dir = os.path.join(self.test_path, "requirements")
+        out_path = os.path.join(out_dir, "requirements.txt")
 
         role_names = th.create_roles(self.test_path)
 
         (out, err) = utils.capture_shell(
             "ansigenome export {0} -o {1}".format(self.test_path,
-                                                  out_path))
+                                                  out_dir))
 
         self.assertTrue(os.path.exists(out_path))
 
-        rolefile = utils.file_to_string(out_path)
+        requirements = utils.file_to_string(out_path)
 
         for role in role_names:
-            self.assertIn(role, rolefile)
+            self.assertIn(role, requirements)
+            self.assertIn(",master", requirements)
 
         self.assertEqual(out, "")
         self.assertEqual(err, "")
