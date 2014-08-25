@@ -18,7 +18,7 @@ env:
   - SITE_AND_INVENTORY="tests/main.yml -i tests/inventory"
 
 install:
-  - "pip install 'ansible>=1.6.6'"
+  - "pip install ansible"
   - "printf '[defaults]\\nroles_path = ../' > ansible.cfg"
 
 script:
