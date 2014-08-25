@@ -7,6 +7,8 @@ import utils as utils
 
 
 default_mainyml_template = """---
+# role: %repo_name
+
 # %values go here
 """
 
@@ -74,11 +76,15 @@ class Init(object):
             create_folder_path = os.path.join(self.output_path, folder)
             utils.mkdir_p(create_folder_path)
 
+            mainyml_template = default_mainyml_template.replace(
+                "%repo_name", self.repo_name)
+            mainyml_template = mainyml_template.replace(
+                "%values", folder)
+
             if not folder == "templates" and not folder == "meta":
                 utils.string_to_file(os.path.join(create_folder_path,
                                                   "main.yml"),
-                                     default_mainyml_template.replace(
-                                         "%values", folder))
+                                     mainyml_template)
 
     def create_tests(self):
         """

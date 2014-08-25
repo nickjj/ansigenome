@@ -54,8 +54,8 @@ class TestScan(unittest.TestCase):
         self.assertIn("6 facts", out)
         self.assertIn("8 files", out)
         self.assertIn("23 files", out)
-        self.assertIn("56 lines", out)
-        self.assertIn("170 lines", out)
+        self.assertIn("60 lines", out)
+        self.assertIn("182 lines", out)
         self.assertEqual(err, "")
 
 if __name__ == "__main__":
