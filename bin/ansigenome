@@ -62,9 +62,9 @@ def build_option_parser(action):
     if action == "scan":
         parser.set_usage("{0} [ROLES_PATH]".format(usage_prefix))
     elif action == "rebuild":
-        parser.set_usage("{0} [ROLES_PATH] -u GITHUB_USERNAME \
-                            [-r TEMPLATE_README] [-t TEMPLATE_META] \
-                            [-x REPO_PREFIX]".format(usage_prefix))
+        parser.set_usage("{0} [ROLES_PATH] -u GITHUB_USERNAME "
+                         "[-r TEMPLATE_README] [-t TEMPLATE_META] "
+                         "[-x REPO_PREFIX]".format(usage_prefix))
         parser.add_option("-u", "--github-username",
                           dest="github_username",
                           help="your github account name")
@@ -83,12 +83,12 @@ def build_option_parser(action):
     elif action == "init":
         parser.set_usage("{0} OUT_PATH [-r REPO_NAME]".format(usage_prefix))
         parser.add_option("-r", "--repo-name", dest="repo_name",
-                          help="replace the role name with the repo name \
-                                  in tests/main.yml if it is different")
+                          help="replace the role name with the repo name "
+                               "in tests/main.yml if it is different")
     elif action == "export":
-        parser.set_usage(
-            "{0} [ROLES_PATH] -p OUT_DIR [-y YAML] [-u] GITHUB_USERNAME \
-            [-b BRANCH] [-x REPO_PREFIX]".format(usage_prefix))
+        parser.set_usage("{0} [ROLES_PATH] -p OUT_DIR [-y YAML] "
+                         "[-u] GITHUB_USERNAME [-b BRANCH] "
+                         "[-x REPO_PREFIX]".format(usage_prefix))
         parser.add_option("-o", "--out-dir", dest="out_dir",
                           help="the output directory path")
         parser.add_option("-y", "--yaml", dest="yaml",
@@ -102,8 +102,8 @@ def build_option_parser(action):
                           default="master",
                           help="the branch/tag/version to use")
     elif action == "dump":
-        parser.set_usage("{0} [ROLES_PATH] -o OUT_FILE \
-                            [-r]".format(usage_prefix))
+        parser.set_usage("{0} [ROLES_PATH] -o "
+                         "OUT_FILE [-r]".format(usage_prefix))
         parser.add_option("-o", "--out-file", dest="out_file",
                           help="the output file path")
         parser.add_option("-r", "--with-readme", dest="with_readme",
