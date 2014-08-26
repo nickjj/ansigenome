@@ -1,3 +1,9 @@
+## v0.2.0
+- Rename the meta_info.inventory attribute to meta_info.quick_start
+  - Also removed the inventory header from the readme by default.
+- Fix a bug which caused string blocks to lose their spacing.
+  - Also make the use of string blocks in the meta fields more apparent.
+
 ## v0.1.2
 - Support the Ansible 1.8+ requirements file format.
 
