@@ -180,7 +180,7 @@ class TestRebuild(unittest.TestCase):
         self.assertIn("github.com/foo/{0}".format(role_name), meta)
         self.assertIn("master", meta)
 
-        fields = ["galaxy_id", "inventory", "defaults",
+        fields = ["galaxy_id", "quick_start", "defaults",
                   "facts", "custom", "footer"]
         for field in fields:
             self.assertIn(field, meta)

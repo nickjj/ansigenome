@@ -144,7 +144,7 @@ Here are all of the values you have access to in the template if you decide to m
     meta_info: {}
 
     # Describe the goal of your project, this appears at the top of the readme.
-    meta_info.synopsis: "It is an ansible role that ..."
+    meta_info.synopsis: It is an ansible role that ..."
 
     # The full github url to where your role is hosted.
     meta_info.github_url: "https://github.com/%github_username/%repo_name"
@@ -157,7 +157,7 @@ Here are all of the values you have access to in the template if you decide to m
 
     # Add a getting started guide to your readme.
     # It should be the bare minimum to get going with your role.
-    meta_info.inventory: ""
+    meta_info.quick_start: ""
 
     # Overwrite the generated defaults with custom text.
     meta_info.defaults: ""

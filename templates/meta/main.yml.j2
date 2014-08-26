@@ -39,8 +39,8 @@ meta_info:
   github_url: "{{ meta_info.github_url | default('N/A') }}"
   git_branch: "{% if meta_info.git_branch %}{{ meta_info.git_branch }}{% else %}master{% endif %}"
   galaxy_id: "{% if meta_info.galaxy_id %}{{ meta_info.galaxy_id }}{% endif %}"
-  inventory: |
-{% if meta_info.inventory %}{{ meta_info.inventory | indent(4, true)}}{% endif %}
+  quick_start: |
+{% if meta_info.quick_start %}{{ meta_info.quick_start | indent(4, true)}}{% endif %}
   defaults: |
 {% if meta_info.defaults %}{{ meta_info.defaults | indent(4, true)}}{% endif %}
   facts: |

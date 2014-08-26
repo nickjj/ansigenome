@@ -3,11 +3,10 @@
 ## What is {{ galaxy_name }}{% if meta_info.synopsis is defined %}
 {{ meta_info.synopsis | trim }}{% endif %}
 
-{% if meta_info.inventory is defined and meta_info.inventory %}
+{% if meta_info.quick_start is defined and meta_info.quick_start %}
 ## Quick start
 
-### Inventory
-{{ meta_info.inventory | trim | indent(4, true) }}{% endif %}
+{{ meta_info.quick_start | trim | indent(4, true) }}{% endif %}
 
 ## Installation
 
