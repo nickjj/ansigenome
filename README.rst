@@ -3,234 +3,259 @@
 Ansigenome
 ==========
 
-Ansigenome is a command line tool designed to help you manage your Ansible roles. It does 6 things:
-
--  **scan** a path containing Ansible roles and report back useful stats
--  **rebuild** a path of roles which auto generates a ``README.md`` and ``meta/main.yml`` from templates
--  **run** shell commands inside of each role's directory
--  **init** new roles with a `travis-ci <https://travis-ci.org>`_ test already made for you
--  **export** a path of roles to a file to be consumed by ``ansible-galaxy install -r``
--  **dump** a json file containing every stat it gathers from a directory
-
-A screenshot speaks a thousand words:
+Ansigenome is a command line tool designed to help you manage your Ansible roles.
 
 .. figure:: https://raw.githubusercontent.com/nickjj/ansigenome/master/docs/ansigenome.png
-   :alt: Ansigen screenshot
+   :alt: Ansigenome screenshot
 
+Table of contents
+~~~~~~~~~~~~~~~~~
 
-Read the `benefits guide`_ to learn why you might want to use Ansigenome.
+- `Use case`_
+- `Installation`_
+- `Quick start`_
+- `Template variables`_
+- `Contributing`_
+- `Author`_
+
+Use case
+~~~~~~~~
+
+Are you someone with 1 or 100+ roles? Then you will benefit from using Ansigenome, let's go over what Ansigenome can do for you:
+
+- `Gather metrics on your roles`_
+- `Standardize your readmes in an automated way`_
+- `Augment existing meta files`_
+- `Generate requirement files`_
+- `Create brand new roles`_
+- `Run shell commands in the context of each role`_
+
+Gather metrics on your roles
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Just run ``ansigenome scan`` at a path containing all of your roles or ``ansigenome scan /path/to/roles`` and it will gather stats such as:
+
+- Number of defaults, facts, files and lines found in each role and total them
+- Verify if you're missing meta or readme files
+
+Will it change my roles?
+````````````````````````
+
+Nope. This command is completely read only. All of your custom formatting and content is safe.
+
+Standardize your readmes in an automated way
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When I started to get to about 5 roles I dreaded making readmes for each one because there's so much boilerplate and duplication. We're programmers, so let's use tools to help us.
+
+``ansigenome gendoc`` will do the same as ``scan`` except it will read your ``meta/main.yml`` file and generate a readme based on the stats it found and also format your readme based on a jinja2 template.
+
+You can use the default template or optionally supply a path/url to a custom template if you want to make it more personal, no problem.
+
+Will it change my roles?
+````````````````````````
+
+It will not modify your meta file but it **will overwrite your existing readme file** for each role it's ran against. You can still add custom info to the readme, but this will be done through the meta file, don't worry about that just yet.
+
+Can I see an example of what it generates?
+``````````````````````````````````````````
+
+Absolutely. This project sprung out of need while working on the `DebOps project <https://github.com/debops>`_. There's about 60 roles all using an Ansigenome generated readme.
+
+All of them were fully generated with 0 manual edits.
+
+Augment existing meta files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You might have 35 roles already written and might want Ansigenome to help you make the adjustment over to using Ansigenome.
+
+``ansigenome genmeta`` will take a peek at your meta files for each role, replace certain fields with values you provided to its config (more on this later) and add ansigenome-only fields to that meta file.
+
+If you wanted to migrate over to using Ansigenome then this is what you'll want to run before ``ansigenome gendoc``. After running ``genmeta`` you will be able to take your old readme files and move some of it to the new meta file that ``genmeta`` made for you.
+
+Will it change my roles?
+````````````````````````
+
+It will rewrite your meta file for each role but it **will not mess with your formatting**. It will only augment a few fields that are missing and overwrite things like the ``galaxy_info.company`` name with what you supplied in the Ansigenome config (more on this later, we're almost there).
+
+Generate requirement files
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Did you know ``ansible-galaxy`` allows you to pass in a file which contains a list of roles to install? This is especially useful on large projects with many roles.
+
+Just run ``ansigenome reqs -o <path to output file>`` and it will create the file for you. You can also not include the `-o` flag and it will write to STDOUT instead so you can preview it.
+
+It supports the ``txt`` format and the new and upcoming ``yml`` format which will be introduced in Ansible 1.8.
+
+Will it change my roles?
+````````````````````````
+
+Not at all. It just reads a few files.
+
+Create brand new roles
+~~~~~~~~~~~~~~~~~~~~~~
+
+Everyone loves making new roles right? Well, ``ansigenome init <role name/path>`` will do just that for you. What's different from using ``ansible-galaxy init``? Here, I'll tell you:
+
+- Creates an "Ansigenome ready" meta file
+- Creates a ``tests/`` directory and ``.travis.yml`` file for you automatically
+
+It uses another tool for the test code. You'll never have to write messy Travis configs again but you can still benefit from Travis itself.
+
+Will it change my roles?
+````````````````````````
+
+Nah, but it will make a brand new shiny role for you.
+
+Run shell commands in the context of each role
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sometimes you just want to run a shell command against all of your roles.  Similar to how Ansible lets you run adhoc commands on hosts.
+
+``ansigenome -m 'touch foo'`` would create the ``foo`` file in the root directory of each role.
 
 Installation
-============
+~~~~~~~~~~~~
 
-If you have Ansible installed then you already have all of the dependencies you need to run Ansigenome. You have 2 options for installation:
-
-``pip install ansigenome`` or ``easy_install ansigenome``
-
-Ansible installed setup tools so you should already have ``easy_install``. You may need to use sudo if you get permission errors.
-
-Usage
-=====
-
-The help is setup similar to Ansible's command line tools. Your best bet is to just type ``ansigenome`` in a terminal to get a list of commands and explore the options.
+If you have Ansible installed then you already have all of the dependencies you need to run Ansigenome. Pick one of the way below:
 
 ::
 
-    Usage: ansigenome [scan|rebuild|run|init|export|dump] [--help] [options]
+    # Pick an installation method that agrees with you.
 
+    pip install ansigenome
+    easy_install ansigenome
+    git clone https://github.com/nickjj/ansigenome
+
+
+Quick start
+~~~~~~~~~~~
+
+So Ansigenome is installed, well done. Just run ``ansigenome config`` and answer a few questions. You only need to do this once.
+
+At this point you can run any of the commands below.
+
+::
+
+    Usage: ansigenome [config|scan|gendoc|genmeta|reqs|init|run|dump] [--help] [options]
+
+
+    ansigenome config --help
+    create a necessary config file to make Ansigenome work
 
     ansigenome scan --help
     scan a path containing Ansible roles and report back useful stats
 
-    ansigenome rebuild --help
-    rebuild a path of roles which auto generates a `README.md` and `meta/main.yml` from templates
+    ansigenome gendoc --help
+    generate a README from the meta file for each role
+
+    ansigenome genmeta --help
+    augment existing meta files to be compatible with Ansigenome
+
+    ansigenome reqs --help
+    export a path of roles to a file to be consumed by ansible-galaxy install -r
+
+    ansigenome init --help
+    init new roles with a custom meta file and tests
 
     ansigenome run --help
     run shell commands inside of each role's directory
 
-    ansigenome init --help
-    init new roles with a travis-ci test already made for you
-
-    ansigenome export --help
-    export a path of roles to a file to be consumed by ansible-galaxy install -r
-
     ansigenome dump --help
-    dump a json file containing every stat it gathers from a directory
+    dump a json file containing every stat it gathers from the scan path
 
+Tips
+````
 
-    Options:
-      -h, --help  show this help message and exit
+-  ``scan``, ``gendoc``, ``genmeta`` and ``run`` don't require a roles path
+   - It will try ``$PWD/playbooks/roles`` then ``$PWD``
+   - This allows you to run Ansigenome from your roles path easily
 
-    'ansigenome command --help' for more information on a specific command
+- You can write a config out to a custom path with ``-o <path>``
+   - The non-home version of the config will be used if found
 
-Example rebuild output
-^^^^^^^^^^^^^^^^^^^^^^
-`Here's a gist`_ of an example meta file and readme that was automatically generated. After rebuilding it is expected that you visit each role's meta file and update any relevant information for that role.
+- The `reqs` command accepts a ``-v`` flag to interactively version each role
 
-Getting the most from rebuild
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-If you plan to rebuild your roles then you should treat the readme file as something you never touch. All of your changes to the readme file must come from the meta file.
+- The `init` command accepts a ``-c`` flag
+   - Supply a comma separated list of Galaxy categories
 
-You should also provide documentation for your default role variables as comments inside of your ``defaults/main.yml`` file because that file gets injected directly into the readme as is unless you overwrite it in the meta file.
+- ``scan``, ``gendoc``, ``genmeta``, ``run`` and ``dump`` accept an ``-l`` flag
+   - Supply a comma separated list of roles to white list
 
-Templates
-=========
+- If you are the only author you do not need to specify ``meta_info.authors``
 
-You might decide that the default templates don't suite your style. That's completely reasonable. You can supply your own readme and meta templates.
+Template variables
+~~~~~~~~~~~~~~~~~~
 
-You can either provide a url to the template on the command line or a path to the template when you run the ``rebuild`` command.
-
-README.md.j2
-^^^^^^^^^^^^
-
-Here are all of the values you have access to in the template if you decide to make your own custom readme template. Check `templates/README.md.j2 <https://github.com/nickjj/ansigenome/tree/master/templates/README.md.j2>`_ for an example.
+Here's the available variables you can use in your meta file or optional custom readme template:
 
 ::
 
+    # Access a single author (taken from your config).
+    author.name
+    author.company
+    author.url
+    author.email
+    author.twitter
+    author.github
 
-    # The username supplied by the -u flag in Ansigenome.
-    github_username: "%github_username"
+    # Access all of the authors.
+    authors
 
-    # The repo name supplied by Ansigenome.
-    repo_name: "%repo_name"
+    # License.
+    license.type
+    license.url
 
-    # The full role name in the galaxy format supplied by Ansigenome.
-    galaxy_name: "%galaxy_name"
+    # SCM (source control management).
+    scm.type
+    scm.host
+    scm.user
+    scm.repo_prefix
 
-    # ============================================================================
-    # You also have access to everything in the meta/main.yml.j2 template.
-    # Look below in the meta/main.yml.j2 section to see a list of values.
-    # ============================================================================
+    # Dynamic items (they are calculated/normalized for you automatically).
+    role.name
+    role.galaxy_name
+    role.slug
 
-meta/main.yml.j2
-^^^^^^^^^^^^^^^^
+    # Standard items (you can access any property of these objects).
+    dependencies
+    galaxy_info
+    ansigenome_info
 
-Here are all of the values you have access to in the template if you decide to make your own custom meta template. Check `templates/meta/main.yml.j2 <https://github.com/nickjj/ansigenome/tree/master/templates/meta/main.yml.j2>`_ for an example.
+      # ansigenome_info fields
+      .galaxy_id   : String based ID to find your role on the Galaxy
+      .travis      : Boolean to determine if this role is on Travis-CI
+      .beta        : Boolean to mark this role as Beta
 
-::
+      .quick_start : String block containing a quick start guide
+      .usage       : String block containing a detailed usage guide
+      .custom      : String block containing anything you want
 
-    # Populated with the author's name or Your name if it can't find it.
-    galaxy_info.author: "Your name"
+Custom readme template
+``````````````````````
 
-    # A short 1 liner which appears on the galaxy.
-    galaxy_info.description: "A short description of your role."
+You might decide that the current template doesn't suite your style. That's completely reasonable. You can supply your own readme template.
 
-    # The company that this role belongs to.
-    galaxy_info.company: ""
-
-    # The license.
-    galaxy_info.license: "MIT"
-
-    # The minimum version of Ansible for this role.
-    galaxy_info.min_ansible_version: 1.6
-
-    # The platforms that this role supports.
-    galaxy_info.platforms:
-      - name: Ubuntu
-        versions:
-        - precise
-      - name: Debian
-        versions:
-        - wheezy
-
-    # ----------------------------------------------------------------------------
-
-    # A list of any dependencies for this role.
-    dependencies: []
-
-    # ----------------------------------------------------------------------------
-
-    # An extension to the meta file to hold this role's custom data.
-    meta_info: {}
-
-    # Describe the goal of your project, this appears at the top of the readme.
-    meta_info.synopsis: |
-        It is an ansible role that ...
-
-    # The full github url to where your role is hosted.
-    meta_info.github_url: "https://github.com/%github_username/%repo_name"
-
-    # The git branch to use.
-    meta_info_git_branch: "master"
-
-    # The role id to find your role on Ansible's galaxy.
-    meta_info.galaxy_id: ""
-
-    # Add a getting started guide to your readme.
-    # It should be the bare minimum to get going with your role.
-    meta_info.quick_start: |
-        
-
-    # Overwrite the generated defaults with custom text.
-    meta_info.defaults: |
-        
-
-    # Overwrite the generated facts with custom text.
-    meta_info.facts: |
-        
-
-    # Add anything you want under the facts.
-    meta_info.custom: |
-        
-
-    # Any extra text you would like to add at the very bottom of the readme.
-    meta_info.footer: |
-        
-
-Stats gathered
-==============
-
-Here are the stats gathered which could be dumped to json if you wish.
-
-::
-
-    report = {
-        "totals": {
-            "roles": 0,
-            "dependencies" 0,
-            "defaults": 0,
-            "facts": 0,
-            "files": 0,
-            "lines": 0,
-        },
-        "roles": {
-            # All of the stats below get harvested from each role you scan.
-            %role_name: {
-                "total_dependencies": 0
-                "total_defaults": 0,
-                "total_facts": 0,
-                "total_lines": 0,
-                "total_files": 0,
-                "facts": [],
-                "dependencies": {},
-                "defaults": [],
-                "meta": {},
-                "readme": "",
-            }
-        },
-        "stats": {
-            "longest_role_name_length": 0
-        }
-    }
+Just add the path to the custom readme template to your config file. It can be either a local path or URL.
 
 Contributing
-============
+~~~~~~~~~~~~
 
 If you would like to contribute then check out `Ansible's contribution guide <https://github.com/ansible/ansible/blob/devel/CONTRIBUTING.md#contributing-code-features-or-bugfixes>`_ because this project expects the same requirements and it contains great tips on using git branches.
 
-In addition to that your code must pass the default pep8 style guide. I have travis running a test to ensure the code follows that guide but your best bet is to find a plugin for your editor if you don't have one already.
-
-License
-=======
-
-`GPLv3 <https://www.gnu.org/licenses/quick-guide-gplv3.html>`_
+In addition to that your code must pass the default pep8 style guide. I have Travis running a test to ensure the code follows that guide but your best bet is to find a plugin for your editor if you don't have one already.
 
 Author
-======
+~~~~~~
 
 Ansigenome was created by Nick Janetakis nick.janetakis@gmail.com.
 
-Special thanks to `@drybjed <https://github.com/drybjed>`_ for coming up with the name of the tool. This project idea spawned from trying to break up his `ginas project <https://github.com/ginas/ginas>`_ into multiple roles. Neither of us wanted to manually make 50 repos and 50 readmes so I decided to learn Python and make this tool instead.
+Special thanks to `@drybjed <https://github.com/drybjed>`_ for coming up with the name of the tool. This project idea spawned from trying to break up the `DebOps project <https://github.com/debops>`_ into multiple roles. Neither of us wanted to manually make 50 repos and 50 readmes so I decided to learn Python and make this tool instead.
+
+License
+~~~~~~~
+
+`GPLv3 <https://www.gnu.org/licenses/quick-guide-gplv3.html>`_
 
 .. |PyPI version| image:: https://badge.fury.io/py/ansigenome.png
    :target: https://pypi.python.org/pypi/ansigenome
@@ -238,5 +263,3 @@ Special thanks to `@drybjed <https://github.com/drybjed>`_ for coming up with th
    :target: https://pypi.python.org/pypi/ansigenome
 .. |Build status| image:: https://secure.travis-ci.org/nickjj/ansigenome.png
    :target: https://travis-ci.org/nickjj/ansigenome
-.. _benefits guide: https://github.com/nickjj/ansigenome/blob/master/docs/benefits.md
-.. _Here's a gist: https://gist.github.com/nickjj/0638b5f0839176bc6b37
