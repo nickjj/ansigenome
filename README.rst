@@ -129,6 +129,7 @@ If you have Ansible installed then you already have all of the dependencies you 
     easy_install ansigenome
 
     # If you want to live on the edge...
+
     git clone https://github.com/nickjj/ansigenome
     cd ansigenome ; sudo python setup.py develop
 
@@ -187,7 +188,7 @@ Tips
 - ``scan``, ``gendoc``, ``genmeta``, ``run`` and ``dump`` accept an ``-l`` flag
     - Supply a comma separated list of roles to white list
 
-- If you are the only author you do not need to specify ``meta_info.authors``
+- If you are the only author you do not need to specify ``ansigenome_info.authors``
 
 Template variables
 ~~~~~~~~~~~~~~~~~~
