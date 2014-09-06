@@ -232,6 +232,7 @@ Here's the available variables you can use in your meta file or optional custom 
       galaxy_id   : String based ID to find your role on the Galaxy
       travis      : Boolean to determine if this role is on Travis-CI
       beta        : Boolean to mark this role as Beta
+      version     : String to store which version this role is at (unused atm)
 
       quick_start : String block containing a quick start guide
       usage       : String block containing a detailed usage guide
