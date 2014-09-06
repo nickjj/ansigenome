@@ -16,4 +16,4 @@ before_script:
 
 script:
   - "flake8 ."
-  - "cd test/integration && python -m unittest discover ."
+  - "cd test/integration && TEST=1 python -m unittest discover ."

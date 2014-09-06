@@ -33,21 +33,21 @@ MESSAGES = {
     "url_unreachable": "The following url was unreachable:",
     "yaml_error": "%file contains 1 or more syntax errors:",
     "template_error": "%file contains 1 or more syntax errors:",
-    "github_user_missing": "You must supply --github-user, " +
-    "ie. github-user foo",
     "run_success": "%role_count roles were modified with this shell command:",
     "run_error": "There was an error running this shell command:",
-    "dump_success": "The roles were dumped as json to:",
+    "dump_success": "The role stats were dumped as json to:",
+    "help_config": "create a necessary config file to make ansigenome work",
     "help_scan": "scan a path containing Ansible roles and report back " +
     "useful stats",
-    "help_rebuild": "rebuild a path of roles which auto generates a " +
-    "README.md and meta/main.yml from templates",
+    "help_gendoc": "generate a README from the meta file for each role",
+    "help_genmeta": "augment existing meta files to be compatible with" +
+    " Ansigenome",
+    "help_reqs": "export a path of roles to a file to be consumed" +
+    " by ansible-galaxy install -r",
+    "help_init": "init new roles with a custom meta file and tests",
     "help_run": "run shell commands inside of each role's directory",
-    "help_init": "init new roles with a travis-ci test already made for you",
-    "help_export": "export a path of roles to a file to be consumed " +
-    "by ansible-galaxy install -r",
     "help_dump": "dump a json file containing every stat it gathers from " +
-    "a directory"
+    "the scan path"
 }
 
 TEST_PATH = os.path.join(os.path.sep, "tmp", "ansigenome")
