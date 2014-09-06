@@ -1,31 +1,139 @@
 import os.path
 
+import utils
+
+
+GIT_AUTHOR = utils.capture_shell("git config user.name")[0][:-1]
+GIT_EMAIL = utils.capture_shell("git config user.email")[0][:-1]
 
 MODULE_DIR = os.path.join(os.path.dirname(__file__), os.path.pardir)
 
-VALID_ACTIONS = ("scan", "rebuild", "run", "init", "export", "dump")
+VALID_ACTIONS = ("config", "scan", "gendoc", "genmeta",
+                 "reqs", "init", "run", "dump")
+
+CONFIG_FILE = ".ansigenome.conf"
+
+CONFIG_DEFAULT_PATH = os.path.expanduser("~")
+
+CONFIG_QUESTIONS = [
+    (
+        "author", (
+            ["name", "What's your name?", GIT_AUTHOR],
+            ["company", "Which company do you belong to?", ""],
+            ["url", "What's your website?", ""],
+            ["email", "What's your e-mail address?", GIT_EMAIL],
+            ["twitter", "What's your twitter name without the @?", ""]
+        )
+    ),
+    (
+        "license", (
+            ["type", "Which license are you using?", "MIT"],
+            ["url", "What's the license's URL?",
+                    "https://tldrlegal.com/license/mit-license"]
+        )
+    ),
+    (
+        "scm", (
+            ["type", "Which source control are you using?", "git"],
+            ["host", "Which host are you using for SCM?",
+                     "https://github.com"],
+            ["user", "What's your user name on the above host?", "someone"],
+            ["repo_prefix", "How are your roles prefixed in the url?",
+                            "ansible-"]
+        )
+
+    ),
+    (
+        "options", (
+            ["reqs_format", "Default requirements file format? yml | txt",
+                            "yml"],
+        ),
+    ),
+]
+
+CONFIG_MUST_CONTAIN = {
+    "author": {
+        "name": "str",
+        "company": "str",
+        "url": "str",
+        "email": "str",
+        "twitter": "str",
+    },
+    "license": {
+        "type": "str",
+        "url": "str",
+    },
+    "scm": {
+        "type": "str",
+        "host": "str",
+        "user": "str",
+        "repo_prefix": "str",
+    },
+    "options": {
+        "readme_template": "str",
+        "travis": "bool",
+        "quiet": "bool",
+        "reqs_format": "str",
+        "dump_with_readme": "bool",
+        "test_runner": "str",
+    },
+}
 
 ANSIBLE_FOLDERS = ("defaults", "handlers", "meta",
                    "tasks", "templates", "tests", "vars")
 
-ROLES_PATH = os.path.join("playbooks", "roles")
-
 README_TEMPLATE_PATH = os.path.join(MODULE_DIR,
                                     "templates", "README.md.j2")
-META_TEMPLATE_PATH = os.path.join(MODULE_DIR,
-                                  "templates", "meta", "main.yml.j2")
+
+DEFAULT_META_FILE = """---
+
+dependencies: []
+
+galaxy_info:
+  author: '%author_name'
+  description: '%role_name described in 1 sentence...'
+  company: '%author_company'
+  license: '%license_type'
+  min_ansible_version: '1.7.1'
+  platforms:
+    - name: Ubuntu
+      versions:
+        - precise
+        - trusty
+    - name: Debian
+      versions:
+        - wheezy
+        - jessie
+  categories: [ %categories ]
+
+ansigenome_info:
+  galaxy_id: ''
+
+  travis: True
+
+  synopsis: |
+    %role_name described in a few paragraphs....
+
+  usage: |
+    Describe how to use %role_name...
+
+  #custom: |
+  #  Any custom output you want after the usage section...
+"""
+
+
 LOG_COLOR = {
     "ok": "green",
     "skipped": "cyan",
     "changed": "yellow",
-    "failed": "red"
+    "missing_readme": "yellow",
+    "missing_meta": "red",
 }
 
 MESSAGES = {
-    "default_roles_path_missing": "By default ansigenome will look for " +
-    " roles in 'playbooks/roles', that path was not found so you " +
-    " must supply a path to your roles\n",
     "empty_roles_path": "No roles were found at this path:",
+    "invalid_config": "'%key' was missing from the following config, please" +
+    " fix it:",
     "path_missing": "The following path could not be found:",
     "path_exists": "The following path already exists:",
     "path_unmakable": "The following error occurred when trying to " +
