@@ -360,7 +360,8 @@ class Scan(object):
         # re-attach the ---
         new_meta = "---\n\n" + new_meta
 
-        if os.path.join(self.paths["role"], ".travis.yml"):
+        travis_path = os.path.join(self.paths["role"], ".travis.yml")
+        if os.path.exists(travis_path):
             new_meta = new_meta.replace("travis: False", "travis: True")
 
         utils.string_to_file(self.paths["meta"], new_meta)
