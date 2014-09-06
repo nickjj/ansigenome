@@ -228,14 +228,18 @@ Here's the available variables you can use in your meta file or optional custom 
     galaxy_info
     ansigenome_info
 
-      # ansigenome_info fields
-      .galaxy_id   : String based ID to find your role on the Galaxy
-      .travis      : Boolean to determine if this role is on Travis-CI
-      .beta        : Boolean to mark this role as Beta
+      # ansigenome_info fields.
+      galaxy_id   : String based ID to find your role on the Galaxy
+      travis      : Boolean to determine if this role is on Travis-CI
+      beta        : Boolean to mark this role as Beta
 
-      .quick_start : String block containing a quick start guide
-      .usage       : String block containing a detailed usage guide
-      .custom      : String block containing anything you want
+      quick_start : String block containing a quick start guide
+      usage       : String block containing a detailed usage guide
+      custom      : String block containing anything you want
+
+      authors     : List containing information about each author
+
+You can find many meta example files at the `Debops project <https://github.com/debops>`_ page.
 
 Custom readme template
 ``````````````````````
