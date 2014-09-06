@@ -213,8 +213,7 @@ def load_config():
     if os.path.exists(pwd_config_path):
         this_config = pwd_config_path
         found_config = True
-
-    if not found_config and os.path.exists(default_config_path):
+    elif not found_config and os.path.exists(default_config_path):
         this_config = default_config_path
     else:
         # There are no configs at all, so let's help the user make one.
