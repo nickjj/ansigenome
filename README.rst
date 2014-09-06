@@ -239,7 +239,7 @@ Here's the available variables you can use in your meta file or optional custom 
 
       authors     : List containing information about each author
 
-You can find many meta example files at the `Debops project <https://github.com/debops>`_ page.
+You can find many meta example files at the `DebOps project <https://github.com/debops>`_ page.
 
 Custom readme template
 ``````````````````````
