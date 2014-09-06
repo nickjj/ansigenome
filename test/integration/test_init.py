@@ -57,7 +57,7 @@ class TestInit(unittest.TestCase):
         self.assertIn("1 sentence", meta)
         self.assertIn(role_name, meta)
         self.assertIn("Debian", meta)
-        self.assertIn("categories: [ foo,bar,baz ]", meta)
+        self.assertIn("categories: [foo,bar,baz]", meta)
         self.assertIn("ansigenome_info", meta)
         self.assertIn("galaxy_id", meta)
         self.assertIn("travis: True", meta)

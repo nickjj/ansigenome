@@ -104,7 +104,7 @@ galaxy_info:
       versions:
         - wheezy
         - jessie
-  categories: [ %categories ]
+  categories: [%categories]
 
 ansigenome_info:
   galaxy_id: ''
