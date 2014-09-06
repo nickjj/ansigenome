@@ -85,7 +85,7 @@ Did you know ``ansible-galaxy`` allows you to pass in a file which contains a li
 
 Just run ``ansigenome reqs -o <path to output file>`` and it will create the file for you. You can also not include the `-o` flag and it will write to STDOUT instead so you can preview it.
 
-It supports the ``txt`` format and the new and upcoming ``yml`` format which will be introduced in Ansible 1.8.
+It supports the ``txt`` format and the upcoming ``yml`` format which will be introduced in Ansible 1.8.
 
 Will it change my roles?
 ````````````````````````
@@ -100,7 +100,7 @@ Everyone loves making new roles right? Well, ``ansigenome init <role name/path>`
 - Creates an "Ansigenome ready" meta file
 - Creates a ``tests/`` directory and ``.travis.yml`` file for you automatically
 
-It uses another tool called `Rolespec <https://github.com/nickjj/rolespec`_ for the test code. Don't worry though, you don't need to download anything.
+It uses another tool called `Rolespec <https://github.com/nickjj/rolespec>`_ for the test code. Don't worry though, you don't need to download anything.
 
 You'll also never have to write messy Travis configs again but you can still benefit from Travis itself.
 
@@ -170,19 +170,19 @@ Tips
 ````
 
 -  ``scan``, ``gendoc``, ``genmeta`` and ``run`` don't require a roles path
-   - It will try ``$PWD/playbooks/roles`` then ``$PWD``
-   - This allows you to run Ansigenome from your roles path easily
+    - It will try ``$PWD/playbooks/roles`` then ``$PWD``
+    - This allows you to run Ansigenome from your roles path easily
 
 - You can write a config out to a custom path with ``-o <path>``
-   - The non-home version of the config will be used if found
+    - The non-home version of the config will be used if found
 
 - The `reqs` command accepts a ``-v`` flag to interactively version each role
 
 - The `init` command accepts a ``-c`` flag
-   - Supply a comma separated list of Galaxy categories
+    - Supply a comma separated list of Galaxy categories
 
 - ``scan``, ``gendoc``, ``genmeta``, ``run`` and ``dump`` accept an ``-l`` flag
-   - Supply a comma separated list of roles to white list
+    - Supply a comma separated list of roles to white list
 
 - If you are the only author you do not need to specify ``meta_info.authors``
 
