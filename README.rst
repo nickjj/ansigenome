@@ -100,7 +100,7 @@ Everyone loves making new roles right? Well, ``ansigenome init <role name/path>`
 - Creates an "Ansigenome ready" meta file
 - Creates a ``tests/`` directory and ``.travis.yml`` file for you automatically
 
-It uses another tool called `Rolespec <https://github.com/nickjj/rolespec>`_ for the test code. Don't worry though, you don't need to download anything.
+It uses another tool called `Rolespec <https://github.com/nickjj/rolespec>`_ for the test code. Don't worry, you don't need to download anything.
 
 You'll also never have to write messy Travis configs again but you can still benefit from Travis itself.
 
