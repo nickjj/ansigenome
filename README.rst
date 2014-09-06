@@ -127,7 +127,10 @@ If you have Ansible installed then you already have all of the dependencies you 
 
     pip install ansigenome
     easy_install ansigenome
+
+    # If you want to live on the edge...
     git clone https://github.com/nickjj/ansigenome
+    cd ansigenome ; sudo python setup.py develop
 
 
 Quick start
