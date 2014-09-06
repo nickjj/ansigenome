@@ -1,6 +1,7 @@
 import errno
 import json
 import os
+import re
 import subprocess
 import sys
 import urllib2
@@ -115,6 +116,15 @@ def exit_if_path_not_found(path):
         ui.error(c.MESSAGES["path_missing"], path)
         sys.exit(1)
 
+
+def ask(question, default):
+    result = raw_input("{0} [{1}]: ".format(question, default))
+
+    if not result:
+        result = default
+
+    return result
+
 # ------------------------------------------------------------------------
 # yaml
 # ------------------------------------------------------------------------
@@ -148,22 +158,6 @@ def to_nice_yaml(yaml_input, indentation=2):
     return yaml.safe_dump(yaml_input, indent=indentation,
                           allow_unicode=True, default_flow_style=False)
 
-
-def j2_to_yaml(path):
-    """
-    Return yaml without the jinja2 template tags.
-    """
-    yaml_without_j2_tags = []
-
-    file = open(path, "r")
-    for line in file:
-        if not line.startswith("{"):
-            yaml_without_j2_tags.append(line)
-    file.close()
-
-    return yaml_load("".join(yaml_without_j2_tags))
-
-
 # ------------------------------------------------------------------------
 # process capturing and detection
 # ------------------------------------------------------------------------
@@ -180,10 +174,56 @@ def capture_shell(command):
 
     return proc.communicate()
 
+# ------------------------------------------------------------------------
+# general
+# ------------------------------------------------------------------------
+
+
+def keys_in_dict(d, parent_key, keys):
+    """
+    Create a list of keys from a dict recursively.
+    """
+    for key, value in d.iteritems():
+        if isinstance(value, dict):
+            keys_in_dict(value, key, keys)
+        else:
+            if parent_key:
+                prefix = parent_key + "."
+            else:
+                prefix = ""
+
+            keys.append(prefix + key)
+
+    return keys
+
+
+def swap_yaml_string(file_path, swaps):
+    """
+    Swap a string in a yaml file without touching the existing formatting.
+    """
+    original_file = file_to_string(file_path)
+    new_file = original_file
+    changed = False
+
+    for item in swaps:
+        match = re.compile(r'(?<={0}: )(["\']?)(.*)\1'.format(item[0]),
+                           re.MULTILINE)
+
+        new_file = re.sub(match, item[1], new_file)
+
+    if new_file != original_file:
+        changed = True
+
+    string_to_file(file_path, new_file)
+
+    return (new_file, changed)
+
 
 # ------------------------------------------------------------------------
 # ansigenome specific
 # ------------------------------------------------------------------------
+
+
 def exit_if_no_roles(roles_count, roles_path):
     """
     Exit if there were no roles found.
@@ -245,3 +285,41 @@ def stripped_args(args):
         stripped_args.append(arg.strip())
 
     return stripped_args
+
+
+def normalize_role(role, config):
+    """
+    Normalize a role name.
+    """
+    scm = config["scm"]
+
+    if role.startswith(scm["repo_prefix"]):
+        role_name = role.replace(scm["repo_prefix"], "")
+    else:
+        if "." in role:
+            galaxy_prefix = "{0}.".format(scm["user"])
+            role_name = role.replace(galaxy_prefix, "")
+        else:
+            role_name = role
+
+    return role_name
+
+
+def create_meta_main(create_path, config, role, categories):
+    """
+    Create a meta template.
+    """
+    meta_file = c.DEFAULT_META_FILE.replace(
+        "%author_name", config["author"]["name"])
+    meta_file = meta_file.replace(
+        "%author_company", config["author"]["company"])
+    meta_file = meta_file.replace("%license_type", config["license"]["type"])
+    meta_file = meta_file.replace("%role_name", role)
+
+    # Normalize the category so %categories always gets replaced.
+    if not categories:
+        categories = ""
+
+    meta_file = meta_file.replace("%categories", categories)
+
+    string_to_file(create_path, meta_file)

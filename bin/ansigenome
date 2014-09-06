@@ -7,10 +7,12 @@ from optparse import OptionParser
 
 import ansigenome.constants as c
 import ansigenome.ui as ui
+import ansigenome.test_helpers as th
 import ansigenome.utils as utils
 
-from ansigenome.export import Export
+from ansigenome.config import Config
 from ansigenome.init import Init
+from ansigenome.reqs import Reqs
 from ansigenome.run import Run
 from ansigenome.scan import Scan
 
@@ -59,92 +61,79 @@ def build_option_parser(action):
 
     usage_prefix = "Usage: %%prog %s" % action
 
-    if action == "scan":
-        parser.set_usage("{0} [ROLES_PATH]".format(usage_prefix))
-    elif action == "rebuild":
-        parser.set_usage("{0} [ROLES_PATH] -u GITHUB_USERNAME "
-                         "[-r TEMPLATE_README] [-t TEMPLATE_META] "
-                         "[-x REPO_PREFIX]".format(usage_prefix))
-        parser.add_option("-u", "--github-username",
-                          dest="github_username",
-                          help="your github account name")
-        parser.add_option("-r", "--template-readme",
-                          dest="template_readme",
-                          default=c.README_TEMPLATE_PATH,
-                          help="supply a custom readme template path or url")
-        parser.add_option("-t", "--template-meta", dest="template_meta",
-                          default=c.META_TEMPLATE_PATH,
-                          help="supply a custom meta template path or url")
+    if action == "config":
+        parser.set_usage("{0} [-o OUT_FILE]".format(usage_prefix))
+    elif action == "scan":
+        parser.set_usage("{0} ROLES_PATH".format(usage_prefix))
+    elif action == "gendoc":
+        parser.set_usage("{0} ROLES_PATH ".format(usage_prefix))
+    elif action == "genmeta":
+        parser.set_usage("{0} ROLES_PATH ".format(usage_prefix))
+    elif action == "reqs":
+        parser.set_usage("{0} ROLES_PATH [-o OUT_FILE] [-f FORMAT]"
+                         "[-v INTERACTIVE_VERSION]".format(usage_prefix))
+        parser.add_option("-f", "--format",
+                          dest="format",
+                          help="output format, overrides the config value")
+        parser.add_option("-v", "--interactive-version",
+                          dest="interactive_version",
+                          action="store_true",
+                          help="input the version for each role 1 by 1")
+    elif action == "init":
+        parser.set_usage("{0} ROLE_PATH "
+                         "[-c GALAXY_CATEGORIES]".format(usage_prefix))
+        parser.add_option("-c", "--galaxy-categories",
+                          dest="galaxy_categories",
+                          help="comma separated string of galaxy categories")
     elif action == "run":
-        parser.set_usage("{0} [ROLES_PATH] -m COMMAND".format
+        parser.set_usage("{0} ROLES_PATH -m COMMAND".format
                          (usage_prefix))
         parser.add_option("-m", "--command", dest="command",
-                          help="Execute this shell command on each role")
-    elif action == "init":
-        parser.set_usage("{0} OUT_PATH [-r REPO_NAME]".format(usage_prefix))
-        parser.add_option("-r", "--repo-name", dest="repo_name",
-                          help="replace the role name with the repo name "
-                               "in tests/main.yml if it is different")
-    elif action == "export":
-        parser.set_usage("{0} [ROLES_PATH] -p OUT_DIR [-y YAML] "
-                         "[-u] GITHUB_USERNAME [-b BRANCH] "
-                         "[-x REPO_PREFIX]".format(usage_prefix))
-        parser.add_option("-o", "--out-dir", dest="out_dir",
-                          help="the output directory path")
-        parser.add_option("-y", "--yaml", dest="yaml",
-                          action="store_true",
-                          help="use the new 1.8+ style requirements file")
-        parser.add_option("-u", "--github-username",
-                          dest="github_username",
-                          default="GITHUB_USERNAME",
-                          help="your github account name")
-        parser.add_option("-b", "--branch", dest="branch",
-                          default="master",
-                          help="the branch/tag/version to use")
+                          help="execute this shell command on each role")
     elif action == "dump":
-        parser.set_usage("{0} [ROLES_PATH] -o "
-                         "OUT_FILE [-r]".format(usage_prefix))
-        parser.add_option("-o", "--out-file", dest="out_file",
-                          help="the output file path")
-        parser.add_option("-r", "--with-readme", dest="with_readme",
-                          action="store_true",
-                          default=False,
-                          help="include the readme file in the dump")
-    if action in ("scan", "rebuild", "run", "dump"):
+        parser.set_usage("{0} ROLES_PATH -o OUT_FILE ".format(usage_prefix))
+    if action in ("scan", "gendoc", "genmeta", "run", "dump"):
         parser.add_option("-l", "--limit", dest="limit",
-                          help="a comma separated list of roles to white list")
-        parser.add_option("-q", "--quiet", dest="quiet",
-                          action="store_true",
-                          help="do not report anything to stdout")
-    if action in ("rebuild",  "export"):
-        parser.add_option("-x", "--repo-prefix", dest="repo_prefix",
-                          default="",
-                          help="a prefix to apply to each role name")
+                          help="comma separated string of roles to white list")
+    if action in ("config", "reqs", "dump"):
+        parser.add_option("-o", "--out", dest="out_file",
+                          help="output file path")
 
     return parser
 
 
-def execute_scan(args, options, parser):
+def execute_config(args, options, config, parser):
+    """
+    Execute the config action.
+    """
+    Config(args, options, config)
+
+
+def execute_scan(args, options, config, parser):
     """
     Execute the scan action.
     """
     check_roles_path(args, parser)
-    Scan(args, options)
+    Scan(args, options, config)
 
 
-def execute_rebuild(args, options, parser):
+def execute_gendoc(args, options, config, parser):
     """
-    Execute the rebuild action.
+    Execute the gendoc action.
     """
-    if options.github_username is None:
-        parser.print_help()
-        sys.exit()
-
     check_roles_path(args, parser)
-    Scan(args, options, rebuild=True)
+    Scan(args, options, config, gendoc=True)
 
 
-def execute_run(args, options, parser):
+def execute_genmeta(args, options, config, parser):
+    """
+    Execute the genmeta action.
+    """
+    check_roles_path(args, parser)
+    Scan(args, options, config, genmeta=True)
+
+
+def execute_run(args, options, config, parser):
     """
     Execute the run action.
     """
@@ -153,10 +142,10 @@ def execute_run(args, options, parser):
         sys.exit()
 
     check_roles_path(args, parser)
-    Run(args, options)
+    Run(args, options, config)
 
 
-def execute_init(args, options, parser):
+def execute_init(args, options, config, parser):
     """
     Execute the init action.
     """
@@ -164,22 +153,18 @@ def execute_init(args, options, parser):
         parser.print_help()
         sys.exit()
 
-    Init(args, options)
+    Init(args, options, config)
 
 
-def execute_export(args, options, parser):
+def execute_reqs(args, options, config, parser):
     """
-    Execute the export action.
+    Execute the reqs action.
     """
-    if options.out_dir is None:
-        parser.print_help()
-        sys.exit()
-
     check_roles_path(args, parser)
-    Export(args, options)
+    Reqs(args, options, config)
 
 
-def execute_dump(args, options, parser):
+def execute_dump(args, options, config, parser):
     """
     Execute the dump action.
     """
@@ -188,28 +173,79 @@ def execute_dump(args, options, parser):
         sys.exit()
 
     check_roles_path(args, parser)
-    Scan(args, options, dump=True)
+    Scan(args, options, config, dump=True)
 
 
 def check_roles_path(args, parser):
     """
     Use the default role path or the user supplied roles path.
     """
-    used_default = False
+    found_path = False
 
     if len(args) == 0:
-        roles_path = c.ROLES_PATH
-        used_default = True
+        roles_path = os.path.join(os.getcwd(), "playbooks", "roles")
+
+        if os.path.exists(roles_path):
+            found_path = True
+
+        if not found_path:
+            roles_path = os.getcwd()
+            found_path = True
     else:
         roles_path = args[0]
 
     if not os.path.exists(roles_path):
-        if used_default:
-            ui.error(c.MESSAGES["default_roles_path_missing"])
-            parser.print_help()
-        else:
-            ui.error(c.MESSAGES["path_missing"], roles_path)
+        ui.error(c.MESSAGES["path_missing"], roles_path)
         sys.exit(1)
+
+    # add the path to args
+    args.append(roles_path)
+
+
+def load_config():
+    """
+    Load properties from the yaml file.
+    """
+    default_config_path = os.path.join(c.CONFIG_DEFAULT_PATH, c.CONFIG_FILE)
+    pwd_config_path = os.path.join(os.getcwd(), c.CONFIG_FILE)
+    found_config = False
+
+    if os.path.exists(pwd_config_path):
+        this_config = pwd_config_path
+        found_config = True
+
+    if not found_config and os.path.exists(default_config_path):
+        this_config = default_config_path
+    else:
+        # There are no configs at all, so let's help the user make one.
+        Config([], {}, {})
+        sys.exit(0)
+
+    return (utils.yaml_load(this_config, err_quit=True), this_config)
+
+
+def load_test_config():
+    """
+    Load the test config when running tests.
+    """
+    test_path = os.path.join(c.TEST_PATH, c.CONFIG_FILE)
+    th.create_ansigenome_config(test_path)
+
+    return (utils.yaml_load(test_path, err_quit=True), test_path)
+
+
+def validate_config(config, path):
+    """
+    Enforce that certain keys exist in the config.
+    """
+    config_keys = utils.keys_in_dict(config, "", [])
+    default_config_keys = utils.keys_in_dict(c.CONFIG_MUST_CONTAIN, "", [])
+
+    for key in default_config_keys:
+        if key not in config_keys:
+            ui.error(c.MESSAGES["invalid_config"].replace("%key", key),
+                     path)
+            sys.exit(1)
 
 
 def main():
@@ -219,11 +255,22 @@ def main():
     action = get_action(sys.argv)
     parser = build_option_parser(action)
     (options, args) = parser.parse_args()
+
+    # A little bit hacky but this lets us use an isolated test config.
+    if os.getenv("TEST"):
+        (config, config_path) = load_test_config()
+    else:
+        (config, config_path) = load_config()
+
+    # skip validating the config when generating a config
+    if action != "config":
+        validate_config(config, config_path)
+
     args = utils.stripped_args(args)
 
     if 1:
         fn = globals()["execute_%s" % action]
-        fn(args, options, parser)
+        fn(args, options, config, parser)
 
 
 if __name__ == "__main__":

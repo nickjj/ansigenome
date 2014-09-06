@@ -32,15 +32,9 @@ class TestScan(unittest.TestCase):
             utils.string_to_file(defaults_path, th.DEFAULTS_TEMPLATE)
             utils.string_to_file(tasks_path, th.TASKS_TEMPLATE)
 
-            # test various meta files, including no meta file for one
-            # of the roles
-            meta = th.META_TEMPLATE
-            if i == 0:
-                meta = "---"
-            else:
-                meta.replace("dependencies: []", "")
-            if i < 2:
-                utils.string_to_file(meta_path, meta)
+            # remove 1 of the meta files
+            if i == 2:
+                os.remove(meta_path)
 
         (out, err) = utils.capture_shell(
             "ansigenome scan {0}".format(self.test_path))
@@ -55,7 +49,11 @@ class TestScan(unittest.TestCase):
         self.assertIn("8 files", out)
         self.assertIn("23 files", out)
         self.assertIn("60 lines", out)
-        self.assertIn("182 lines", out)
+        self.assertIn("248 lines", out)
+
+        self.assertIn("0 ok       3 missing readme(s)       " +
+                      "0 missing meta(s)", out)
+
         self.assertEqual(err, "")
 
 if __name__ == "__main__":

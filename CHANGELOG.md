@@ -1,3 +1,19 @@
+## v0.3.0
+- Most commands work without a roles path now, based off the PWD
+  - You can still supply a path too
+
+- Add an `.ansigenome.conf` to store most commonly used configuration options
+  - You only need to set this once
+  - It makes using ansigenome much more user friendly, less flags to remember
+
+- `export` has been renamed to `reqs`
+- `reqs` supports both text and yaml formatting
+- `gendoc` has been added to generate documentation
+- `genmeta` has been added to generate/augment meta files
+  - It will not mess with your formatting either
+
+- Many bug fixes and more...
+
 ## v0.2.0
 - Rename the meta_info.inventory attribute to meta_info.quick_start
   - Also removed the inventory header from the readme by default.

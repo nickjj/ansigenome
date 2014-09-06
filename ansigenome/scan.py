@@ -1,5 +1,6 @@
 import re
 import os
+import sys
 
 import constants as c
 import ui as ui
@@ -10,21 +11,17 @@ class Scan(object):
     """
     Loop over each role on the roles path and report back stats on them.
     """
-    def __init__(self, args, options, rebuild=False, dump=False):
-        if len(args) == 0:
-            self.roles_path = os.path.join(os.getcwd(), c.ROLES_PATH)
-        else:
-            self.roles_path = args[0]
+    def __init__(self, args, options, config,
+                 gendoc=False, genmeta=False, dump=False):
+        self.roles_path = args[0]
 
         self.options = options
-        self.rebuild = rebuild
+        self.config = config
+        self.gendoc = gendoc
+        self.genmeta = genmeta
         self.dump = dump
 
-        repo_prefix = ""
-        if rebuild:
-            repo_prefix = options.repo_prefix
-
-        self.roles = utils.roles_dict(self.roles_path, repo_prefix)
+        self.roles = utils.roles_dict(self.roles_path, "")
 
         if self.options.limit:
             self.limit_roles()
@@ -33,19 +30,21 @@ class Scan(object):
 
         self.regex_facts = re.compile(r"set_fact:\w+")
         self.paths = {}
+
+        # default values for the role report
+        self.defaults = ""
+        self.dependencies = []
         self.all_files = []
         self.yaml_files = []
-        self.defaults = ""
-        self.facts = []
-        self.dependencies = []
-        self.verify = False
 
-        # only load and validate the templates when rebuilding files
-        if self.rebuild:
-            self.meta_template = utils.template(options.template_meta)
-            self.readme_template = utils.template(options.template_readme)
-            self.verify = True
-            self.meta_dict = None
+        # only load and validate the readme when generating docs
+        if self.gendoc:
+            if os.path.exists(config["options"]["readme_template"]):
+                readme_template = config["options"]["readme_template"]
+            else:
+                readme_template = c.README_TEMPLATE_PATH
+
+            self.readme_template = utils.template(readme_template)
 
         self.report = {
             "totals": {
@@ -57,22 +56,20 @@ class Scan(object):
                 "lines": 0,
             },
             "state": {
-                "ok_meta": 0,
-                "ok_readme": 0,
-                "skipped_meta": 0,
-                "skipped_readme": 0,
-                "changed_meta": 0,
-                "changed_readme": 0,
-                "failed_meta": 0,
-                "failed_readme": 0
+                "ok_role": 0,
+                "skipped_role": 0,
+                "changed_role": 0,
+                "missing_readme_role": 0,
+                "missing_meta_role": 0,
             },
             "roles": {},
             "stats": {
-                "longest_role_name_length": len(max(self.roles, key=len))
+                "longest_role_name_length": len(max(self.roles, key=len)),
             }
         }
 
         self.scan_roles()
+
         if self.dump:
             self.dump_roles()
 
@@ -97,8 +94,8 @@ class Scan(object):
         """
         for key, value in sorted(self.roles.iteritems()):
             self.paths["role"] = os.path.join(self.roles_path, key)
-            self.paths["meta"] = os.path.join(self.paths["role"],
-                                              "meta", "main.yml")
+            self.paths["meta"] = os.path.join(self.paths["role"], "meta",
+                                              "main.yml")
             self.paths["readme"] = os.path.join(self.paths["role"],
                                                 "README.md")
             self.paths["defaults"] = os.path.join(self.paths["role"],
@@ -106,36 +103,40 @@ class Scan(object):
 
             self.report["roles"][key] = self.report_role(key)
 
-            # we are writing a meta and readme file which means the
-            # the state of the role needs to be updated before it gets
-            # output by the ui
-            if self.verify:
-                if self.valid_meta(key) and self.rebuild:
-                    self.set_meta_template_vars(value)
-                    self.write_meta(key)
+            # we are writing a readme file which means the state of the role
+            # needs to be updated before it gets output by the ui
+            if self.gendoc:
+                if self.valid_meta(key):
+                    self.make_meta_dict_consistent()
                     self.set_readme_template_vars(key, value)
                     self.write_readme(key)
+            # only load the meta file when generating meta files
+            elif self.genmeta:
+                self.make_or_augment_meta(key)
+                if self.valid_meta(key):
+                    self.make_meta_dict_consistent()
+                    self.write_meta(key)
+            else:
+                self.update_scan_report(key)
 
-            if not self.options.quiet:
+            if not self.config["options"]["quiet"]:
                 ui.role(key,
                         self.report["roles"][key],
                         self.report["stats"]["longest_role_name_length"])
 
         self.tally_role_columns()
 
-        if not self.options.quiet:
+        if not self.config["options"]["quiet"]:
             ui.totals(self.report["totals"],
                       len(self.report["roles"].keys()),
                       self.report["stats"]["longest_role_name_length"])
 
-            if self.verify:
-                print "\n"
-                ui.state_totals(self.report["state"], "meta",
-                                self.report["stats"]
-                                ["longest_role_name_length"])
-                ui.state_totals(self.report["state"], "readme",
-                                self.report["stats"]
-                                ["longest_role_name_length"])
+            if self.gendoc:
+                ui.gen_totals(self.report["state"], "readme")
+            elif self.genmeta:
+                ui.gen_totals(self.report["state"], "meta")
+            else:
+                ui.scan_totals(self.report["state"])
 
     def dump_roles(self):
         """
@@ -150,19 +151,17 @@ class Scan(object):
         del self.report["state"]
         for role in self.report["roles"]:
             del self.report["roles"][role]["state"]
-            if not self.options.with_readme:
+            if not self.config["options"]["dump_with_readme"]:
                 del self.report["roles"][role]["readme"]
 
             defaults = self.report["roles"][role]["defaults"]
             self.report["roles"][role]["defaults"] = utils.yaml_load("",
                                                                      defaults)
-            meta = self.report["roles"][role]["meta"]
-            self.report["roles"][role]["meta"] = utils.yaml_load("", meta)
 
         report_as_json_string = utils.dict_to_json(self.report)
         utils.string_to_file(out_file, report_as_json_string)
 
-        if not self.options.quiet:
+        if not self.config["options"]["quiet"]:
             ui.ok("", c.MESSAGES["dump_success"], out_file)
 
     def report_role(self, role):
@@ -194,16 +193,7 @@ class Scan(object):
         if not os.path.exists(self.paths["meta"]):
             return ""
 
-        meta = utils.file_to_string(self.paths["meta"])
-
-        meta_dict = utils.yaml_load(self.paths["meta"])
-
-        if meta_dict and "dependencies" in meta_dict:
-            self.dependencies = meta_dict["dependencies"]
-        else:
-            self.dependencies = []
-
-        return meta
+        return utils.file_to_string(self.paths["meta"])
 
     def gather_readme(self):
         """
@@ -321,182 +311,202 @@ class Scan(object):
         """
         if os.path.exists(self.paths["meta"]):
             self.meta_dict = utils.yaml_load(self.paths["meta"])
+        else:
+            self.report["state"]["missing_meta_role"] += 1
+            self.report["roles"][role]["state"] = "missing_meta"
+
+            return False
 
         is_valid = True
 
         # utils.yaml_load returns False when the file is invalid
         if isinstance(self.meta_dict, bool):
             is_valid = False
-
-            # we need to turn it back into a dict or crazy things happen
-            self.meta_dict = {}
-
-        self.meta_dict = self.make_meta_consistent(self.meta_dict)
-
-        if not is_valid:
-            self.report["state"]["failed_meta"] += 1
-            self.report["state"]["skipped_readme"] += 1
-            self.report["roles"][role]["state"] = "failed"
+            sys.exit(1)
 
         return is_valid
 
-    def make_meta_consistent(self, meta_dict):
+    def make_or_augment_meta(self, role):
         """
-        Return a new meta dict that fixes inconsistencies.
+        Create or augment a meta file.
         """
-        # if a meta file consists of only --- then this condition fixes
-        # a null error were "meta_info" never exists in self.meta_dict
-        if meta_dict is None:
-            meta_dict = {}
+        if not os.path.exists(self.paths["meta"]):
+            utils.create_meta_main(self.paths["meta"], self.config, role, "")
+            self.report["state"]["ok_role"] += 1
+            self.report["roles"][role]["state"] = "ok"
 
-        if "galaxy_info" not in meta_dict:
-            meta_dict["galaxy_info"] = {}
+        # swap values in place to use the config values
+        swaps = [
+            ("author", self.config["author"]["name"]),
+            ("company", self.config["author"]["company"]),
+            ("license", self.config["license"]["type"]),
+        ]
 
-        if "platforms" not in meta_dict["galaxy_info"]:
-            meta_dict["galaxy_info"]["platforms"] = []
+        (new_meta, _) = utils.swap_yaml_string(self.paths["meta"], swaps)
 
-        if "dependencies" not in meta_dict:
-            meta_dict["dependencies"] = []
+        # normalize the --- at the top of the file by removing it first
+        new_meta = new_meta.replace("---", "")
+        new_meta = new_meta.lstrip()
 
-        if "meta_info" not in meta_dict:
-            meta_dict["meta_info"] = {}
+        # augment missing main keys
+        augments = [
+            ("ansigenome_info", "{}"),
+            ("galaxy_info", "{}"),
+            ("dependencies", "[]"),
+        ]
 
-        return meta_dict
+        new_meta = self.augment_main_keys(augments, new_meta)
 
-    def write_meta(self, role):
+        # re-attach the ---
+        new_meta = "---\n\n" + new_meta
+
+        if os.path.join(self.paths["role"], ".travis.yml"):
+            new_meta = new_meta.replace("travis: False", "travis: True")
+
+        utils.string_to_file(self.paths["meta"], new_meta)
+
+    def augment_main_keys(self, keys, file):
         """
-        Potentially write out a new meta file.
+        Add the main key if it is missing.
         """
-        j2_out = self.meta_template.render(self.meta_template_vars)
+        nfile = file
+        ansigenome_block = """
+ansigenome_info:
+  galaxy_id: ''
 
-        # merge the original meta dict's contents into the meta dict
-        # this avoids clobbering user edited values in the meta file
-        merged_dict = False
-        if os.path.exists(self.paths["meta"]):
-            merged_dict = True
-            original_meta_dict = utils.yaml_load(self.paths["meta"])
-            original_meta_dict = self.make_meta_consistent(original_meta_dict)
-            self.meta_dict = dict(self.meta_dict.items() +
-                                  original_meta_dict.items())
+  travis: False
 
-            # make sure certain values are set if they didn't exist previously
-            template_meta_dict = utils.yaml_load("", input=j2_out)
-            galaxy_author = template_meta_dict["galaxy_info"]["author"]
-            galaxy_platforms = template_meta_dict["galaxy_info"]["platforms"]
-            meta_github_url = template_meta_dict["meta_info"]["github_url"]
+  synopsis: |
+    Describe your role in a few paragraphs....
 
-            if len(self.meta_dict["galaxy_info"]["platforms"]) == 0:
-                self.meta_dict["galaxy_info"]["platforms"] = galaxy_platforms
+  usage: |
+    Describe how to use in more detail...
 
-            if "author" not in self.meta_dict["galaxy_info"]:
-                self.meta_dict["galaxy_info"]["author"] = galaxy_author
+  #custom: |
+  #  Any custom output you want after the usage section..
+"""
 
-            # always renew the github url
-            self.meta_dict["meta_info"]["github_url"] = meta_github_url
-        else:
-            # otherwise just use what we have
-            self.meta_dict = utils.yaml_load("", input=j2_out)
+        for key in keys:
+            if key[0] not in nfile:
+                if key[0] == "ansigenome_info":
+                    # make sure ansigenome_info is always on the bottom
+                    nfile = nfile + "\n{0}".format(ansigenome_block)
+                else:
+                    nfile = "\n{0}: {1}\n\n".format(key[0], key[1]) + nfile
 
-        # sort of hacky but works completely fine for now
-        self.meta_dict["galaxy_info"]["platforms"] = utils.to_nice_yaml(
-            self.meta_dict["galaxy_info"]["platforms"])
-
-        self.meta_dict["dependencies"] = utils.to_nice_yaml(
-            self.meta_dict["dependencies"])
-
-        if merged_dict:
-            # we need to recompile the template with the merged dict
-            j2_out = self.meta_template.render(self.meta_dict)
-
-        self.update_role_report(role, "meta", j2_out)
+        return nfile
 
     def write_readme(self, role):
         """
-        Potentially write out a new readme file.
+        Write out a new readme file.
         """
         j2_out = self.readme_template.render(self.readme_template_vars)
 
-        self.update_role_report(role, "readme", j2_out)
+        self.update_gen_report(role, "readme", j2_out)
 
-    def update_role_report(self, role, report_on, template):
+    def write_meta(self, role):
         """
-        Update the role state and adjust the state totals.
+        Write out a new meta file.
+        """
+        meta_file = utils.file_to_string(self.paths["meta"])
+
+        self.update_gen_report(role, "meta", meta_file)
+
+    def update_scan_report(self, role):
+        """
+        Update the role state and adjust the scan totals.
         """
         state = self.report["state"]
-        state_not_skipped = False
 
-        if not os.path.exists(self.paths[report_on]):
-            state["ok_" + report_on] += 1
+        # ensure the missing meta state is colored up and the ok count is good
+        if self.gendoc:
+            if self.report["roles"][role]["state"] == "missing_meta":
+                return
+
+        if os.path.exists(self.paths["readme"]):
+            state["ok_role"] += 1
             self.report["roles"][role]["state"] = "ok"
-            state_not_skipped = True
-        elif self.report["roles"][role][report_on] != template:
-            state["changed_" + report_on] += 1
+        else:
+            state["missing_readme_role"] += 1
+            self.report["roles"][role]["state"] = "missing_readme"
+
+    def update_gen_report(self, role, file, original):
+        """
+        Update the role state and adjust the gen totals.
+        """
+        state = self.report["state"]
+
+        if not os.path.exists(self.paths[file]):
+            state["ok_role"] += 1
+            self.report["roles"][role]["state"] = "ok"
+        elif (self.report["roles"][role][file] != original and
+                self.report["roles"][role]["state"] != "ok"):
+            state["changed_role"] += 1
             self.report["roles"][role]["state"] = "changed"
-            state_not_skipped = True
-        elif self.report["roles"][role][report_on] == template:
-            state["skipped_" + report_on] += 1
+        elif self.report["roles"][role][file] == original:
+            state["skipped_role"] += 1
             self.report["roles"][role]["state"] = "skipped"
             return
 
-        # avoid clobbering non-skipped states in the terminal output
-        if state_not_skipped:
-            self.report["state"] = state
+        utils.string_to_file(self.paths[file], original)
 
-        utils.string_to_file(self.paths[report_on], template)
-
-    def set_meta_template_vars(self, role):
+    def make_meta_dict_consistent(self):
         """
-        Set the meta template variables.
+        Remove the possibility of the main keys being undefined.
         """
-        github_url = "https://github.com/{0}/{1}".format(
-            self.options.github_username,
-            role.replace("_", "-"))
+        if self.meta_dict is None:
+            self.meta_dict = {}
 
-        self.meta_template_vars = {
-            "galaxy_info": {
-                "author": utils.capture_shell("git config user.name")[0][:-1],
-            },
-            "meta_info": {
-                "github_url": github_url,
-            }
-        }
+        if "galaxy_info" not in self.meta_dict:
+            self.meta_dict["galaxy_info"] = {}
+
+        if "dependencies" not in self.meta_dict:
+            self.meta_dict["dependencies"] = []
+
+        if "ansigenome_info" not in self.meta_dict:
+            self.meta_dict["ansigenome_info"] = {}
 
     def set_readme_template_vars(self, role, repo_name):
         """
         Set the readme template variables.
         """
-        # at this stage both the platforms and dependencies are strings
-        # because they were pretty printed to the meta file
 
-        # this reverts them back to dicts and lists so they can be
-        # looped overly properly in the readme file
+        config_scm = self.config["scm"]
 
-        # this approach might make you want to vomit glass but it works
-        # for the time being until a better approach is found
-        platforms = self.meta_dict["galaxy_info"]["platforms"]
-        self.meta_dict["galaxy_info"]["platforms"] = utils.yaml_load(
-            "", input=platforms)
+        # normalize and expose a bunch of fields to the template
+        authors = []
 
-        self.meta_dict["dependencies"] = utils.yaml_load(
-            "", input=self.meta_dict["dependencies"])
+        role_name = utils.normalize_role(role, self.config)
 
-        self.readme_template_vars = {
-            "github_username": self.options.github_username,
-            "repo_name": repo_name,
-            "role_name": utils.role_name(role),
-            "galaxy_name": role,
-            "galaxy_info": self.meta_dict["galaxy_info"],
-            "dependencies": self.meta_dict["dependencies"],
-            "meta_info": self.meta_dict["meta_info"]
+        normalized_role = {
+            "name": role_name,
+            "galaxy_name": "{0}.{1}".format(config_scm["user"], role_name),
+            "slug": "{0}{1}".format(config_scm["repo_prefix"], role_name),
         }
 
-        if ("defaults" not in self.meta_dict["meta_info"] or
-                len(self.meta_dict["meta_info"]["defaults"]) == 0):
-            # trolled hard by pep8's 79 characters
-            r_defaults = self.report["roles"][role]["defaults"]
-            self.readme_template_vars["meta_info"]["defaults"] = r_defaults
+        if "authors" in self.meta_dict["ansigenome_info"]:
+            authors = self.meta_dict["ansigenome_info"]["authors"]
+        else:
+            authors = [self.config["author"]]
 
-        if ("facts" not in self.meta_dict["meta_info"] or
-                len(self.meta_dict["meta_info"]["facts"]) == 0):
-            facts = "\n".join(self.report["roles"][role]["facts"])
-            self.readme_template_vars["meta_info"]["facts"] = facts
+            if "github" in config_scm["host"]:
+                self.config["author"]["github"] = "{0}/{1}".format(
+                    config_scm["host"],
+                    config_scm["user"])
+
+        self.readme_template_vars = {
+            "authors": authors,
+            "scm": config_scm,
+            "role": normalized_role,
+            "license": self.config["license"],
+            "galaxy_info": self.meta_dict["galaxy_info"],
+            "dependencies": self.meta_dict["dependencies"],
+            "ansigenome_info": self.meta_dict["ansigenome_info"]
+        }
+
+        # add the defaults and facts
+        r_defaults = self.report["roles"][role]["defaults"]
+        self.readme_template_vars["ansigenome_info"]["defaults"] = r_defaults
+
+        facts = "\n".join(self.report["roles"][role]["facts"])
+        self.readme_template_vars["ansigenome_info"]["facts"] = facts

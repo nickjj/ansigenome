@@ -138,5 +138,7 @@ class Init(object):
                                           "tests", "inventory", "hosts"),
                              hosts)
 
-        utils.string_to_file(os.path.join(self.output_path, "tests", "test"),
-                             testyml_template)
+        test_file = os.path.join(self.output_path, "tests", "test")
+        utils.string_to_file(test_file, testyml_template)
+
+        os.chmod(test_file, 0755)
