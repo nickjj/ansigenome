@@ -6,9 +6,10 @@ import utils as utils
 
 
 class Run(object):
-    def __init__(self, args, options):
-        self.options = options
+    def __init__(self, args, options, config):
         self.roles_path = args[0]
+        self.options = options
+        self.config = config
         self.command = options.command
 
         self.execute_command()
@@ -34,6 +35,6 @@ class Run(object):
         if len(stderr) > 0:
             ui.error(c.MESSAGES["run_error"], stderr[:-1])
         else:
-            if not self.options.quiet:
+            if not self.config["options"]["quiet"]:
                 ui.ok(c.MESSAGES["run_success"].replace(
                     "%role_count", str(role_count)), self.options.command)
