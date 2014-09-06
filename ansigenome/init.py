@@ -1,45 +1,47 @@
 import os
 import sys
 
+from datetime import date
+
 import constants as c
 import ui as ui
 import utils as utils
 
 
 default_mainyml_template = """---
-# role: %repo_name
+
+# role: %role_name
 
 # %values go here
 """
 
 default_travisyml_template = """---
-language: "python"
-python: "2.7"
 
-env:
-  - SITE_AND_INVENTORY="tests/main.yml -i tests/inventory"
+language: 'python'
+python: '2.7'
 
-install:
-  - "pip install ansible"
-  - "printf '[defaults]\\nroles_path = ../' > ansible.cfg"
+virtualenv:
+  system_site_packages: true
+
+before_install: True
+install: True
 
 script:
-  - "ansible-playbook $SITE_AND_INVENTORY --syntax-check"
-  - "ansible-playbook $SITE_AND_INVENTORY --connection=local -vvvv"
-  - >
-    ansible-playbook $SITE_AND_INVENTORY --connection=local
-    | grep -q 'changed=0.*failed=0'
-    && (echo 'Idempotence test: PASS' && exit 0)
-    || (echo 'Idempotence test: FAIL' && exit 1)
+  - 'git clone --depth 1 %test_runner'
+  - 'cd %basename ; ./runner -r %role_url'
 """
 
-default_travis_main_template = """---
-- hosts: localhost
-  remote_user: travis
-  sudo: true
+default_testyml_template = """---
 
-  roles:
-    - %repo_name
+#!/bin/bash
+
+# test: Test %role
+# Copyright (C) %year %author <%email>
+
+. "lib/test"
+
+assert_playbook_runs
+assert_playbook_idempotent
 """
 
 
@@ -47,18 +49,18 @@ class Init(object):
     """
     Create a new role, this is meant to replace ansible-galaxy init.
     """
-    def __init__(self, args, options):
+    def __init__(self, args, options, config):
         self.output_path = args[0]
+        self.options = options
+        self.config = config
         self.role_name = os.path.basename(self.output_path)
-
-        if options.repo_name:
-            self.repo_name = options.repo_name
-        else:
-            self.repo_name = self.role_name
+        self.normalized_role = utils.normalize_role(self.role_name,
+                                                    self.config)
 
         self.exit_if_path_exists()
         self.create_skeleton()
-        self.create_tests()
+        self.create_travis_config()
+        self.create_test_case()
 
     def exit_if_path_exists(self):
         """
@@ -77,24 +79,64 @@ class Init(object):
             utils.mkdir_p(create_folder_path)
 
             mainyml_template = default_mainyml_template.replace(
-                "%repo_name", self.repo_name)
+                "%role_name", self.role_name)
             mainyml_template = mainyml_template.replace(
                 "%values", folder)
 
-            if not folder == "templates" and not folder == "meta":
-                utils.string_to_file(os.path.join(create_folder_path,
-                                                  "main.yml"),
-                                     mainyml_template)
+            out_path = os.path.join(create_folder_path, "main.yml")
 
-    def create_tests(self):
+            if folder not in ("templates", "meta", "tests"):
+                utils.string_to_file(out_path, mainyml_template)
+
+            if folder == "meta":
+                utils.create_meta_main(out_path,
+                                       self.config, self.role_name,
+                                       self.options.galaxy_categories)
+
+    def create_travis_config(self):
         """
-        Create a travis test case which tests for idempotency.
+        Create a travis test setup.
         """
+        test_runner = self.config["options"]["test_runner"]
+        scm = self.config["scm"]
+
+        role_url = "{0}".format(os.path.join(scm["host"],
+                                             scm["user"], scm["repo_prefix"] +
+                                             self.normalized_role))
+
+        travisyml_template = default_travisyml_template.replace(
+            "%test_runner", test_runner)
+        travisyml_template = travisyml_template.replace(
+            "%basename", test_runner.split("/")[-1])
+        travisyml_template = travisyml_template.replace(
+            "%role_url", role_url)
+
         utils.string_to_file(os.path.join(self.output_path, ".travis.yml"),
-                             default_travisyml_template)
-        utils.string_to_file(os.path.join(self.output_path, "tests",
-                             "inventory"), "localhost\n")
-        utils.string_to_file(os.path.join(self.output_path, "tests",
-                             "main.yml"),
-                             default_travis_main_template.
-                             replace("%repo_name", self.repo_name))
+                             travisyml_template)
+
+    def create_test_case(self):
+        """
+        Create a test case.
+        """
+        testyml_template = default_testyml_template.replace(
+            "%role", self.normalized_role)
+        testyml_template = testyml_template.replace(
+            "%year", str(date.today().year))
+        testyml_template = testyml_template.replace(
+            "%author", self.config["author"]["name"])
+        testyml_template = testyml_template.replace(
+            "%email", self.config["author"]["email"])
+
+        utils.mkdir_p(os.path.join(self.output_path,
+                                   "tests", "inventory", "group_vars"))
+
+        utils.mkdir_p(os.path.join(self.output_path,
+                                   "tests", "inventory", "host_vars"))
+
+        hosts = "placeholder_fqdn\n"
+        utils.string_to_file(os.path.join(self.output_path,
+                                          "tests", "inventory", "hosts"),
+                             hosts)
+
+        utils.string_to_file(os.path.join(self.output_path, "tests", "test"),
+                             testyml_template)

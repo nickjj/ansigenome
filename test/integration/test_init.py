@@ -20,19 +20,13 @@ class TestInit(unittest.TestCase):
         th.rmrf(self.test_path)
 
     def test_init(self):
-        self.assert_role()
-
-    def test_init_custom_repo_name(self):
-        self.assert_role("-r foo")
+        self.assert_role("-c foo,bar,baz")
 
     def assert_role(self, args=""):
-        path = os.path.join(self.test_path, th.random_string())
-        role_name = os.path.basename(path)
+        role_name = th.random_string()
 
-        if len(args) > 3:
-            repo_name = args[2:-1]
-        else:
-            repo_name = role_name
+        path = os.path.join(self.test_path, role_name)
+        meta_path = os.path.join(path, "meta", "main.yml")
 
         (out, err) = utils.capture_shell(
             "ansigenome init {0} {1}".format(path, args))
@@ -41,10 +35,35 @@ class TestInit(unittest.TestCase):
             assert os.path.exists(os.path.join(path, folder)), "expected " + \
                 "'{0}' to be created".format(folder)
 
-        tests_mainyml = utils.file_to_string(os.path.join(path,
-                                             "tests", "main.yml"))
+            if folder == "tests":
+                inventory_path = os.path.join(path, folder, "inventory")
 
-        self.assertIn(repo_name, tests_mainyml)
+                assert os.path.exists(os.path.join(path,
+                                                   folder,
+                                                   "test")), "expected " + \
+                    "'{0}' to be created".format(folder)
+
+                assert os.path.exists(os.path.join(inventory_path,
+                                                   "hosts")), "expected " + \
+                    "'{0}' to be created".format(folder)
+
+        meta = utils.file_to_string(meta_path)
+
+        print
+        print "Meta file:"
+        print meta
+        print
+        self.assertIn("Test User", meta)
+        self.assertIn("1 sentence", meta)
+        self.assertIn(role_name, meta)
+        self.assertIn("Debian", meta)
+        self.assertIn("categories: [ foo,bar,baz ]", meta)
+        self.assertIn("ansigenome_info", meta)
+        self.assertIn("galaxy_id", meta)
+        self.assertIn("travis: True", meta)
+        self.assertIn("Describe", meta)
+        self.assertIn("custom", meta)
+
         self.assertEqual(out, "")
         self.assertEqual(err, "")
 
