@@ -167,11 +167,11 @@ def gen_totals(report, file_type):
     changed = field_value(report["changed_role"], "changed",
                           c.LOG_COLOR["changed"], 16)
 
-    #missing_meta = field_value(report["missing_meta_role"],
+    # missing_meta = field_value(report["missing_meta_role"],
     #                            "missing meta(s)",
     #                            c.LOG_COLOR["missing_meta"], 16)
 
-    #print "\n{0} {1} {2} {3}".format(ok, skipped, changed, missing_meta)
+    # print "\n{0} {1} {2} {3}".format(ok, skipped, changed, missing_meta)
 
     print "\n{0} {1} {2} {3}".format(label, ok, skipped, changed)
 
