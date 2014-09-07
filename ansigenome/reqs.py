@@ -42,7 +42,7 @@ class Reqs(object):
         """
         role_lines = "---"
 
-        for galaxy_role, role in self.roles.items():
+        for galaxy_role, role in sorted(self.roles.items()):
             yml_item = default_yml_item
 
             if self.src:
@@ -78,7 +78,7 @@ class Reqs(object):
         """
         role_lines = ""
 
-        for role in self.roles.keys():
+        for role in sorted(self.roles.keys()):
             version = self.get_user_version(role)
 
             if version:
