@@ -1,3 +1,9 @@
+## v0.3.2
+
+- Galaxy style requirement/yaml files no longer get the `scm:` property added
+- The `name:` property has been added when the src is URL based
+- Underscores no longer get converted to hyphens for repo names
+
 ## v0.3.1
 
 - Fix a crash with the `reqs` command
