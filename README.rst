@@ -234,7 +234,7 @@ Here's the available variables you can use in your meta file or optional custom 
       beta        : Boolean to mark this role as Beta
       version     : String to store which version this role is at (unused atm)
 
-      quick_start : String block containing a quick start guide
+      synopsis    : String block containing what your role does
       usage       : String block containing a detailed usage guide
       custom      : String block containing anything you want
 
