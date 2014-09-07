@@ -19,6 +19,8 @@ class Reqs(object):
         self.roles = utils.roles_dict(args[0])
         self.out_file = options.out_file
 
+        utils.exit_if_no_roles(len(self.roles.keys()), args[0])
+
         if options.format:
             self.format = options.format
         else:
