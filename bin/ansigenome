@@ -194,15 +194,16 @@ def check_roles_path(args, parser):
     else:
         roles_path = args[0]
 
-        if not os.path.isabs(roles_path):
-            roles_path = os.path.abspath(roles_path)
-
     if not os.path.exists(roles_path):
         ui.error(c.MESSAGES["path_missing"], roles_path)
         sys.exit(1)
 
-    # replace the old argument with the new one
-    args[0] = roles_path
+    if len(args) == 0:
+        # there are no args, so add it at as the first arg
+        args.append(roles_path)
+    else:
+        # replace the old argument with the new one
+        args[0] = roles_path
 
 
 def load_config():
