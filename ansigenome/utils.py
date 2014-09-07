@@ -246,8 +246,7 @@ def roles_dict(path, repo_prefix=""):
     for role in roles:
         if is_role(os.path.join(path, role)):
             if isinstance(role, basestring):
-                role_url_ready = role_name(role).replace("_", "-")
-                role_repo = "{0}{1}".format(repo_prefix, role_url_ready)
+                role_repo = "{0}{1}".format(repo_prefix, role_name(role))
 
                 aggregated_roles[role] = role_repo
 
