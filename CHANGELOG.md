@@ -1,3 +1,8 @@
+## v0.3.1
+
+- Fix a crash with the `reqs` command
+- Sort the roles in the `reqs` output
+
 ## v0.3.0
 - Most commands work without a roles path now, based off the PWD
   - You can still supply a path too
