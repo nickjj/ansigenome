@@ -4,8 +4,8 @@ import utils as utils
 
 
 default_yml_item = """
-
 - src: '%src'
+  name: '%name'
   scm: '%scm'
   version: '%version'
 """
@@ -26,8 +26,10 @@ class Reqs(object):
         else:
             self.format = config["options"]["reqs_format"]
 
+        self.config = config
         self.src = config["scm"]["host"]
         self.scm = config["scm"]["type"]
+        self.user = config["scm"]["user"]
         self.repo_prefix = config["scm"]["repo_prefix"]
         self.interactive_version = options.interactive_version
 
@@ -40,18 +42,26 @@ class Reqs(object):
         """
         Export the yaml version to stdout or requirements file.
         """
-        role_lines = "---"
+        role_lines = "---\n"
 
         for galaxy_role, role in sorted(self.roles.items()):
             yml_item = default_yml_item
 
             if self.src:
+                galaxy_name = utils.normalize_role(role, self.config)
+                yml_item = yml_item.replace("%name",
+                                            "{0}.{1}".format(self.user,
+                                                             galaxy_name))
+
                 if self.repo_prefix:
                     role = self.repo_prefix + role
 
-                src = os.path.join(self.src, role)
+                src = os.path.join(self.src, self.user, role)
             else:
                 src = galaxy_role
+                yml_item = yml_item.replace("  name: '%name'\n", "")
+                yml_item = yml_item.replace("  scm: '%scm'\n", "")
+
             yml_item = yml_item.replace("%src", src)
 
             if self.scm:
