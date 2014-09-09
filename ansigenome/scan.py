@@ -151,9 +151,6 @@ class Scan(object):
         del self.report["state"]
         for role in self.report["roles"]:
             del self.report["roles"][role]["state"]
-            if not self.config["options"]["dump_with_readme"]:
-                del self.report["roles"][role]["readme"]
-
             defaults = self.report["roles"][role]["defaults"]
             self.report["roles"][role]["defaults"] = utils.yaml_load("",
                                                                      defaults)

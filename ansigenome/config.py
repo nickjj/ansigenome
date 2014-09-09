@@ -66,7 +66,6 @@ class Config(object):
         out_config["options"]["readme_template"] = ""
         out_config["options"]["travis"] = True
         out_config["options"]["quiet"] = False
-        out_config["options"]["dump_with_readme"] = False
         out_config["options"]["test_runner"] = test_runner
 
         return out_config

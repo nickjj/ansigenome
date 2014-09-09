@@ -74,7 +74,6 @@ CONFIG_MUST_CONTAIN = {
         "travis": "bool",
         "quiet": "bool",
         "reqs_format": "str",
-        "dump_with_readme": "bool",
         "test_runner": "str",
     },
 }
