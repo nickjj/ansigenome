@@ -1,3 +1,7 @@
+## v0.4.2
+
+- Move the color file to a data folder
+
 ## v0.4.1
 
 - Add the colors file to the manifest

@@ -175,4 +175,6 @@ MESSAGES = {
 TEST_PATH = os.path.join(os.path.sep, "tmp", "ansigenome")
 
 X11_COLORS = utils.file_to_list(os.path.join(os.path.dirname(MODULE_DIR),
+                                             os.pardir,
+                                             "data",
                                              "colors"))

@@ -1,6 +1,6 @@
 recursive-include templates *
 recursive-include docs *
-include ansigenome/colors
+recursive-include data *
 include README.rst
 include LICENSE
 include VERSION
