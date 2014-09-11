@@ -1,3 +1,7 @@
+## v0.4.1
+
+- Add the colors file to the manifest
+
 ## v0.4.0
 
 - The config format has been drastically changed - **Please make new configs**
