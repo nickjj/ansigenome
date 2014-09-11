@@ -1,3 +1,17 @@
+## v0.4.0
+
+- The config format has been drastically changed - **Please make new configs**
+- The config will fix itself when critical fields are missing
+- `reqs` and `dump` have been merged into `export`
+- `export` can also **create a dependency graph**
+  - It can also export png graphs if you have Graphviz installed
+  - You can easily adjust the size/DPI as well through the CLI/config
+- Picking a license in the config is much easier (multiple choice)
+- Use the flat style badge icons in the README
+- When making a requirements file it will look for a VERSION file in your role
+  - It would live inside of each role's root directory
+- Running `ansigenome --version` actually works now
+
 ## v0.3.2
 
 - Galaxy style requirement/yaml files no longer get the `scm:` property added
