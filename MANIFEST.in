@@ -1,4 +1,3 @@
-recursive-include templates *
 recursive-include docs *
 include README.rst
 include LICENSE

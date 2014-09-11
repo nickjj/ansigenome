@@ -1,3 +1,7 @@
+## v0.4.5
+
+- Fix the VERSION file in setup.py and remove the old templates dir
+
 ## v0.4.4
 
 - Fix the missing readme template and VERSION file
