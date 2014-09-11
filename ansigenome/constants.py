@@ -1,3 +1,4 @@
+import pkg_resources
 import os.path
 
 import utils
@@ -174,7 +175,6 @@ MESSAGES = {
 
 TEST_PATH = os.path.join(os.path.sep, "tmp", "ansigenome")
 
-X11_COLORS = utils.file_to_list(os.path.join(os.path.dirname(MODULE_DIR),
-                                             os.pardir,
-                                             "data",
-                                             "colors"))
+X11_COLORS = utils.file_to_list(pkg_resources.resource_filename(__name__,
+                                                                \
+                                os.path.join("data", "colors")))

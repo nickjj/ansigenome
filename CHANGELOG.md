@@ -1,3 +1,7 @@
+## v0.4.3
+
+- Probably fixed the colors file not being included properly
+
 ## v0.4.2
 
 - Move the color file to a data folder

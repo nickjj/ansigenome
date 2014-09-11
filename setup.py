@@ -20,5 +20,6 @@ setup(name="ansigenome",
       license="GPLv3",
       install_requires=["jinja2", "PyYAML", "setuptools"],
       packages=["ansigenome"],
+      package_data={"ansigenome": ["data/*"]},
       scripts=["bin/ansigenome"],
       data_files=[])
