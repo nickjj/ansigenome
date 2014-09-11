@@ -17,15 +17,15 @@ ALLOWED_DUMP_FORMATS = ("json")
 
 LICENSE_TYPES = [
     ["MIT", "https://tldrlegal.com/license/mit-license"],
+    ["GPLv2", "https://tldrlegal.com/license/gnu-general-public-license-v2"],
     ["GPLv3", "https://tldrlegal.com/license/" +
               "gnu-general-public-license-v3-%28gpl-3%29"],
-    ["GPLv2", "https://tldrlegal.com/license/gnu-general-public-license-v2"],
     ["LGPL", "https://tldrlegal.com/license/" +
              "gnu-lesser-general-public-license-v2.1-(lgpl-2.1)"],
     ["Apache-2.0", "https://tldrlegal.com/license/" +
                    "apache-license-2.0-%28apache-2.0%29"],
-    ["BSDv3", "https://tldrlegal.com/license/bsd-3-clause-license-(revised)"],
     ["BSDv2", "https://tldrlegal.com/license/bsd-2-clause-license-(freebsd)"],
+    ["BSDv3", "https://tldrlegal.com/license/bsd-3-clause-license-(revised)"],
     ["Other", "https://tldrlegal.com/license/" +
               "do-what-the-f*ck-you-want-to-public-license-%28wtfpl%29"],
 ]
