@@ -96,8 +96,7 @@ CONFIG_DEFAULTS = {
 ANSIBLE_FOLDERS = ("defaults", "handlers", "meta",
                    "tasks", "templates", "tests", "vars")
 
-README_TEMPLATE_PATH = os.path.join(PACKAGE_RESOURCE,
-                                    "templates", "README.md.j2")
+README_TEMPLATE_PATH = os.path.join(PACKAGE_RESOURCE, "README.md.j2")
 
 DEFAULT_META_FILE = """---
 
