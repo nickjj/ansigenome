@@ -1,3 +1,8 @@
+## v0.4.4
+
+- Fix the missing readme template and VERSION file
+  - Trolled hard by how package files work but I think we're good now
+
 ## v0.4.3
 
 - Probably fixed the colors file not being included properly

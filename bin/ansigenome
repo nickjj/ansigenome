@@ -52,7 +52,8 @@ def build_option_parser(action):
     epilog = ui.epilogue(os.path.basename(sys.argv[0]))
 
     args = " ".join(sys.argv)
-    version = utils.get_version(os.path.join(c.MODULE_DIR, "VERSION"))
+    version = utils.get_version(os.path.join(c.PACKAGE_RESOURCE,
+                                             os.pardir, os.pardir, "VERSION"))
 
     OptionParser.format_epilog = lambda self, formatter: self.epilog
     parser = OptionParser(usage=usage, epilog=epilog,

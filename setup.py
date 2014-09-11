@@ -22,4 +22,4 @@ setup(name="ansigenome",
       packages=["ansigenome"],
       package_data={"ansigenome": ["data/*"]},
       scripts=["bin/ansigenome"],
-      data_files=[])
+      data_files=["VERSION"])

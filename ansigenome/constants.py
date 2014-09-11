@@ -7,7 +7,7 @@ import utils
 GIT_AUTHOR = utils.capture_shell("git config user.name")[0][:-1]
 GIT_EMAIL = utils.capture_shell("git config user.email")[0][:-1]
 
-MODULE_DIR = os.path.join(os.path.dirname(__file__), os.path.pardir)
+PACKAGE_RESOURCE = pkg_resources.resource_filename(__name__, "data")
 
 VALID_ACTIONS = ("config", "scan", "gendoc", "genmeta",
                  "export", "init", "run")
@@ -96,7 +96,7 @@ CONFIG_DEFAULTS = {
 ANSIBLE_FOLDERS = ("defaults", "handlers", "meta",
                    "tasks", "templates", "tests", "vars")
 
-README_TEMPLATE_PATH = os.path.join(MODULE_DIR,
+README_TEMPLATE_PATH = os.path.join(PACKAGE_RESOURCE,
                                     "templates", "README.md.j2")
 
 DEFAULT_META_FILE = """---
@@ -175,6 +175,4 @@ MESSAGES = {
 
 TEST_PATH = os.path.join(os.path.sep, "tmp", "ansigenome")
 
-X11_COLORS = utils.file_to_list(pkg_resources.resource_filename(__name__,
-                                                                \
-                                os.path.join("data", "colors")))
+X11_COLORS = utils.file_to_list(os.path.join(PACKAGE_RESOURCE, "colors"))
