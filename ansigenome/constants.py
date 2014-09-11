@@ -157,7 +157,7 @@ MESSAGES = {
     "yaml_error": "%file contains 1 or more syntax errors:",
     "template_error": "%file contains 1 or more syntax errors:",
     "png_missing_out": "You must supply -o <file> to write the png file",
-    "dot_missing": "To export a PNG graph you must install graphvis",
+    "dot_missing": "To export a PNG graph you must install graphviz",
     "run_success": "%role_count roles were modified with this shell command:",
     "run_error": "There was an error running this shell command:",
     "help_config": "create a necessary config file to make ansigenome work",
