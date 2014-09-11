@@ -74,6 +74,9 @@ class Init(object):
         """
         Create the role's directory and file structure.
         """
+        utils.string_to_file(os.path.join(self.output_path, "VERSION\n"),
+                             "master")
+
         for folder in c.ANSIBLE_FOLDERS:
             create_folder_path = os.path.join(self.output_path, folder)
             utils.mkdir_p(create_folder_path)
@@ -97,11 +100,11 @@ class Init(object):
         """
         Create a travis test setup.
         """
-        test_runner = self.config["options"]["test_runner"]
-        scm = self.config["scm"]
+        test_runner = self.config["options_test_runner"]
 
-        role_url = "{0}".format(os.path.join(scm["host"],
-                                             scm["user"], scm["repo_prefix"] +
+        role_url = "{0}".format(os.path.join(self.config["scm_host"],
+                                             self.config["scm_user"],
+                                             self.config["scm_repo_prefix"] +
                                              self.normalized_role))
 
         travisyml_template = default_travisyml_template.replace(
@@ -123,9 +126,9 @@ class Init(object):
         testyml_template = testyml_template.replace(
             "%year", str(date.today().year))
         testyml_template = testyml_template.replace(
-            "%author", self.config["author"]["name"])
+            "%author", self.config["author_name"])
         testyml_template = testyml_template.replace(
-            "%email", self.config["author"]["email"])
+            "%email", self.config["author_email"])
 
         utils.mkdir_p(os.path.join(self.output_path,
                                    "tests", "inventory", "group_vars"))

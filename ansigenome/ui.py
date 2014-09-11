@@ -74,8 +74,8 @@ def epilogue(app_name):
     command = clr.stringc("command", "cyan")
     help = clr.stringc("--help", "green")
 
-    return "\n'{0} {1} {2}' for more information " + \
-           "on a specific command\n".format(app_name, command, help)
+    return "\n%s %s %s for more info on a command\n" % (app_name,
+                                                        command, help)
 
 
 def command_name(app_name, command, help_text):

@@ -9,7 +9,26 @@ GIT_EMAIL = utils.capture_shell("git config user.email")[0][:-1]
 MODULE_DIR = os.path.join(os.path.dirname(__file__), os.path.pardir)
 
 VALID_ACTIONS = ("config", "scan", "gendoc", "genmeta",
-                 "reqs", "init", "run", "dump")
+                 "export", "init", "run")
+
+ALLOWED_GRAPH_FORMATS = ("png", "dot")
+ALLOWED_REQS_FORMATS = ("txt", "yml")
+ALLOWED_DUMP_FORMATS = ("json")
+
+LICENSE_TYPES = [
+    ["MIT", "https://tldrlegal.com/license/mit-license"],
+    ["GPLv3", "https://tldrlegal.com/license/" +
+              "gnu-general-public-license-v3-%28gpl-3%29"],
+    ["GPLv2", "https://tldrlegal.com/license/gnu-general-public-license-v2"],
+    ["LGPL", "https://tldrlegal.com/license/" +
+             "gnu-lesser-general-public-license-v2.1-(lgpl-2.1)"],
+    ["Apache-2.0", "https://tldrlegal.com/license/" +
+                   "apache-license-2.0-%28apache-2.0%29"],
+    ["BSDv3", "https://tldrlegal.com/license/bsd-3-clause-license-(revised)"],
+    ["BSDv2", "https://tldrlegal.com/license/bsd-2-clause-license-(freebsd)"],
+    ["Other", "https://tldrlegal.com/license/" +
+              "do-what-the-f*ck-you-want-to-public-license-%28wtfpl%29"],
+]
 
 CONFIG_FILE = ".ansigenome.conf"
 
@@ -26,13 +45,6 @@ CONFIG_QUESTIONS = [
         )
     ),
     (
-        "license", (
-            ["type", "Which license are you using?", "MIT"],
-            ["url", "What's the license's URL?",
-                    "https://tldrlegal.com/license/mit-license"]
-        )
-    ),
-    (
         "scm", (
             ["type", "Which source control are you using?", "git"],
             ["host", "Which host are you using for SCM?",
@@ -43,39 +55,41 @@ CONFIG_QUESTIONS = [
         )
 
     ),
+]
+
+CONFIG_MULTIPLE_CHOICE_QUESTIONS = [
     (
-        "options", (
-            ["reqs_format", "Default requirements file format? yml | txt",
-                            "yml"],
-        ),
+        "license", (
+            [9, "Pick a license type by choosing a number:\n\n" +
+             "  1. MIT\n  2. GPLv3\n  3. GPLv2\n" +
+             "  5. LGPL\n  6. Apache-2.0\n" +
+             "  7. BSDv3\n  8. BSDv2\n  9. Other\n\n"]
+        )
     ),
 ]
 
-CONFIG_MUST_CONTAIN = {
-    "author": {
-        "name": "str",
-        "company": "str",
-        "url": "str",
-        "email": "str",
-        "twitter": "str",
-    },
-    "license": {
-        "type": "str",
-        "url": "str",
-    },
-    "scm": {
-        "type": "str",
-        "host": "str",
-        "user": "str",
-        "repo_prefix": "str",
-    },
-    "options": {
-        "readme_template": "str",
-        "travis": "bool",
-        "quiet": "bool",
-        "reqs_format": "str",
-        "test_runner": "str",
-    },
+CONFIG_DEFAULTS = {
+    "author_name": "",
+    "author_company": "",
+    "author_url": "",
+    "author_email": "",
+    "author_twitter": "",
+    "license_type": "",
+    "license_url": "",
+    "scm_type": "",
+    "scm_host": "",
+    "scm_user": "",
+    "scm_repo_prefix": "",
+    "options_readme_template": "",
+    "options_travis": True,
+    "options_quiet": False,
+    "options_test_runner": "https://github.com/nickjj/rolespec",
+    "default_format_graph": ALLOWED_GRAPH_FORMATS[0],
+    "default_format_reqs": ALLOWED_REQS_FORMATS[0],
+    "default_format_dump": ALLOWED_DUMP_FORMATS,
+    "graphviz_size": "15,8",
+    "graphviz_dpi": 130,
+    "graphviz_flags": "",
 }
 
 ANSIBLE_FOLDERS = ("defaults", "handlers", "meta",
@@ -131,8 +145,10 @@ LOG_COLOR = {
 
 MESSAGES = {
     "empty_roles_path": "No roles were found at this path:",
-    "invalid_config": "'%key' was missing from the following config, please" +
+    "invalid_config": "'%key' are missing from the following config, please" +
     " fix it:",
+    "config_upgraded": "Your config file has been updated to include the" +
+    " following new fields:",
     "path_missing": "The following path could not be found:",
     "path_exists": "The following path already exists:",
     "path_unmakable": "The following error occurred when trying to " +
@@ -140,21 +156,23 @@ MESSAGES = {
     "url_unreachable": "The following url was unreachable:",
     "yaml_error": "%file contains 1 or more syntax errors:",
     "template_error": "%file contains 1 or more syntax errors:",
+    "png_missing_out": "You must supply -o <file> to write the png file",
+    "dot_missing": "To export a PNG graph you must install graphvis",
     "run_success": "%role_count roles were modified with this shell command:",
     "run_error": "There was an error running this shell command:",
-    "dump_success": "The role stats were dumped as json to:",
     "help_config": "create a necessary config file to make ansigenome work",
     "help_scan": "scan a path containing Ansible roles and report back " +
     "useful stats",
     "help_gendoc": "generate a README from the meta file for each role",
     "help_genmeta": "augment existing meta files to be compatible with" +
     " Ansigenome",
-    "help_reqs": "export a path of roles to a file to be consumed" +
-    " by ansible-galaxy install -r",
+    "help_export": "export roles to a dependency graph, requirements file" +
+    " and more",
     "help_init": "init new roles with a custom meta file and tests",
     "help_run": "run shell commands inside of each role's directory",
-    "help_dump": "dump a json file containing every stat it gathers from " +
-    "the scan path"
 }
 
 TEST_PATH = os.path.join(os.path.sep, "tmp", "ansigenome")
+
+X11_COLORS = utils.file_to_list(os.path.join(os.path.dirname(MODULE_DIR),
+                                             "colors"))

@@ -6,20 +6,22 @@ import constants as c
 import ui as ui
 import utils as utils
 
+from ansigenome.export import Export
+
 
 class Scan(object):
     """
     Loop over each role on the roles path and report back stats on them.
     """
     def __init__(self, args, options, config,
-                 gendoc=False, genmeta=False, dump=False):
+                 gendoc=False, genmeta=False, export=False):
         self.roles_path = args[0]
 
         self.options = options
         self.config = config
         self.gendoc = gendoc
         self.genmeta = genmeta
-        self.dump = dump
+        self.export = export
 
         self.roles = utils.roles_dict(self.roles_path, "")
 
@@ -39,8 +41,8 @@ class Scan(object):
 
         # only load and validate the readme when generating docs
         if self.gendoc:
-            if os.path.exists(config["options"]["readme_template"]):
-                readme_template = config["options"]["readme_template"]
+            if os.path.exists(config["options_readme_template"]):
+                readme_template = config["options_readme_template"]
             else:
                 readme_template = c.README_TEMPLATE_PATH
 
@@ -70,8 +72,8 @@ class Scan(object):
 
         self.scan_roles()
 
-        if self.dump:
-            self.dump_roles()
+        if self.export:
+            self.export_roles()
 
     def limit_roles(self):
         """
@@ -119,47 +121,46 @@ class Scan(object):
             else:
                 self.update_scan_report(key)
 
-            if not self.config["options"]["quiet"]:
+            if not self.config["options_quiet"] and not self.export:
                 ui.role(key,
                         self.report["roles"][key],
                         self.report["stats"]["longest_role_name_length"])
 
         self.tally_role_columns()
 
-        if not self.config["options"]["quiet"]:
-            ui.totals(self.report["totals"],
-                      len(self.report["roles"].keys()),
-                      self.report["stats"]["longest_role_name_length"])
+        # below this point is only UI output, so we can return
+        if self.config["options_quiet"] or self.export:
+            return
 
-            if self.gendoc:
-                ui.gen_totals(self.report["state"], "readme")
-            elif self.genmeta:
-                ui.gen_totals(self.report["state"], "meta")
-            else:
-                ui.scan_totals(self.report["state"])
+        ui.totals(self.report["totals"],
+                  len(self.report["roles"].keys()),
+                  self.report["stats"]["longest_role_name_length"])
 
-    def dump_roles(self):
+        if self.gendoc:
+            ui.gen_totals(self.report["state"], "readme")
+        elif self.genmeta:
+            ui.gen_totals(self.report["state"], "meta")
+        else:
+            ui.scan_totals(self.report["state"])
+
+    def export_roles(self):
         """
-        Write the contents of the report to json.
+        Export the roles to one of the export types.
         """
-        out_file = self.options.out_file
-
-        if not out_file.endswith(".json"):
-            out_file += ".json"
-
-        # remove unnecessary data and convert string dumps to yaml
+        # prepare the report by removing unnecessary fields
         del self.report["state"]
+        del self.report["stats"]
         for role in self.report["roles"]:
             del self.report["roles"][role]["state"]
-            defaults = self.report["roles"][role]["defaults"]
-            self.report["roles"][role]["defaults"] = utils.yaml_load("",
-                                                                     defaults)
 
-        report_as_json_string = utils.dict_to_json(self.report)
-        utils.string_to_file(out_file, report_as_json_string)
+            defaults_path = os.path.join(self.roles_path, role,
+                                         "defaults", "main.yml")
+            if os.path.exists(defaults_path):
+                defaults = self.report["roles"][role]["defaults"]
+                self.report["roles"][role]["defaults"] = \
+                    utils.yaml_load("", defaults)
 
-        if not self.config["options"]["quiet"]:
-            ui.ok("", c.MESSAGES["dump_success"], out_file)
+        Export(self.roles_path, self.report, self.config, self.options)
 
     def report_role(self, role):
         """
@@ -190,6 +191,23 @@ class Scan(object):
         if not os.path.exists(self.paths["meta"]):
             return ""
 
+        meta_dict = utils.yaml_load(self.paths["meta"])
+
+        # gather the dependencies
+        if meta_dict and "dependencies" in meta_dict:
+            # create a simple list of each role that is a dependency
+            dep_list = []
+
+            for dependency in meta_dict["dependencies"]:
+                dep_list.append(dependency["role"])
+
+            # unique set of dependencies
+            meta_dict["dependencies"] = list(set(dep_list))
+
+            self.dependencies = meta_dict["dependencies"]
+        else:
+            self.dependencies = []
+
         return utils.file_to_string(self.paths["meta"])
 
     def gather_readme(self):
@@ -209,6 +227,8 @@ class Scan(object):
         defaults_lines = []
 
         if not os.path.exists(self.paths["defaults"]):
+            # reset the defaults if no defaults were found
+            self.defaults = ""
             return 0
 
         file = open(self.paths["defaults"], "r")
@@ -334,9 +354,9 @@ class Scan(object):
 
         # swap values in place to use the config values
         swaps = [
-            ("author", self.config["author"]["name"]),
-            ("company", self.config["author"]["company"]),
-            ("license", self.config["license"]["type"]),
+            ("author", self.config["author_name"]),
+            ("company", self.config["author_company"]),
+            ("license", self.config["license_type"]),
         ]
 
         (new_meta, _) = utils.swap_yaml_string(self.paths["meta"], swaps)
@@ -468,35 +488,47 @@ ansigenome_info:
         """
         Set the readme template variables.
         """
-
-        config_scm = self.config["scm"]
-
         # normalize and expose a bunch of fields to the template
         authors = []
+
+        author = {
+            "name": self.config["author_name"],
+            "company": self.config["author_company"],
+            "url": self.config["author_url"],
+            "email": self.config["author_email"],
+            "twitter": self.config["author_twitter"],
+        }
+        scm = {}
+        license = {
+            "type": self.config["license_type"],
+            "url": self.config["license_url"],
+        }
 
         role_name = utils.normalize_role(role, self.config)
 
         normalized_role = {
             "name": role_name,
-            "galaxy_name": "{0}.{1}".format(config_scm["user"], role_name),
-            "slug": "{0}{1}".format(config_scm["repo_prefix"], role_name),
+            "galaxy_name": "{0}.{1}".format(self.config["scm_user"],
+                                            role_name),
+            "slug": "{0}{1}".format(self.config["scm_repo_prefix"],
+                                    role_name),
         }
 
         if "authors" in self.meta_dict["ansigenome_info"]:
             authors = self.meta_dict["ansigenome_info"]["authors"]
         else:
-            authors = [self.config["author"]]
+            authors = [author]
 
-            if "github" in config_scm["host"]:
-                self.config["author"]["github"] = "{0}/{1}".format(
-                    config_scm["host"],
-                    config_scm["user"])
+            if "github" in self.config["scm_host"]:
+                self.config["author_github"] = "{0}/{1}".format(
+                    self.config["scm_host"],
+                    self.config["scm_user"])
 
         self.readme_template_vars = {
             "authors": authors,
-            "scm": config_scm,
+            "scm": scm,
             "role": normalized_role,
-            "license": self.config["license"],
+            "license": license,
             "galaxy_info": self.meta_dict["galaxy_info"],
             "dependencies": self.meta_dict["dependencies"],
             "ansigenome_info": self.meta_dict["ansigenome_info"]

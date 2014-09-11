@@ -35,6 +35,6 @@ class Run(object):
         if len(stderr) > 0:
             ui.error(c.MESSAGES["run_error"], stderr[:-1])
         else:
-            if not self.config["options"]["quiet"]:
+            if not self.config["options_quiet"]:
                 ui.ok(c.MESSAGES["run_success"].replace(
                     "%role_count", str(role_count)), self.options.command)

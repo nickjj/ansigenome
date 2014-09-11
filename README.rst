@@ -5,8 +5,17 @@ Ansigenome
 
 Ansigenome is a command line tool designed to help you manage your Ansible roles.
 
-.. figure:: https://raw.githubusercontent.com/nickjj/ansigenome/master/docs/ansigenome.png
-   :alt: Ansigenome screenshot
+**Scan your roles and organize your documentation**
+
+.. figure:: https://raw.githubusercontent.com/nickjj/ansigenome/master/docs/ansigenome-scan.png
+   :alt: Ansigenome scan screenshot
+
+**Create dependency graphs in seconds**
+
+.. figure:: https://raw.githubusercontent.com/nickjj/ansigenome/master/docs/ansigenome-graph.png
+   :alt: Ansigenome graph of DebOps
+
+...and more!
 
 Table of contents
 ~~~~~~~~~~~~~~~~~
@@ -26,7 +35,7 @@ Are you someone with 1 or 100+ roles? Then you will benefit from using Ansigenom
 - `Gather metrics on your roles`_
 - `Standardize your readmes in an automated way`_
 - `Augment existing meta files`_
-- `Generate requirement files`_
+- `Export graphs and requirements files`_
 - `Create brand new roles`_
 - `Run shell commands in the context of each role`_
 
@@ -78,14 +87,37 @@ Will it change my roles?
 
 It will rewrite your meta file for each role but it **will not mess with your formatting**. It will only augment a few fields that are missing and overwrite things like the ``galaxy_info.company`` name with what you supplied in the Ansigenome config (more on this later, we're almost there).
 
-Generate requirement files
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Export graphs and requirements files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Did you know ``ansible-galaxy`` allows you to pass in a file which contains a list of roles to install? This is especially useful on large projects with many roles.
+Graphs
+``````
 
-Just run ``ansigenome reqs -o <path to output file>`` and it will create the file for you. You can also not include the `-o` flag and it will write to STDOUT instead so you can preview it.
+Just run ``ansigenome export -o <path to png output file>`` and it will use
+Graphviz to create a dependency graph.
 
-It supports the ``txt`` format and the upcoming ``yml`` format which will be introduced in Ansible 1.8.
+You can also tweak the size and DPI of the graph with a few flags or even
+set the output format to be ``-f dot`` so you can pipe it to a different
+Graphviz graphing utility.
+
+Requirements files
+``````````````````
+
+Have a go with ``ansigenome export -t reqs -o <path to output file>`` to
+generate a file for consumption by ``ansible-galaxy install -r <file>``. It also supports the ``-f yml`` flag to use the new yaml format.
+
+JSON dump
+`````````
+
+You can also dump everything Ansigenome gathered to json by running
+``ansigenome export -t dump -o <path to output file>``.
+
+You could then feed that to some database back end or a javascript based graphing utility, etc..
+
+Any chance to output to stdout instead of a file?
+`````````````````````````````````````````````````
+
+Yes, all of the export commands will output to stdout if you omit the ``-o`` flag. The only exception to this is the PNG graph.
 
 Will it change my roles?
 ````````````````````````
@@ -143,11 +175,11 @@ At this point you can run any of the commands below.
 
 ::
 
-    Usage: ansigenome [config|scan|gendoc|genmeta|reqs|init|run|dump] [--help] [options]
+    Usage: ansigenome [config|scan|gendoc|genmeta|export|init|run] [--help] [options]
 
 
     ansigenome config --help
-    create a necessary config file to make Ansigenome work
+    create a necessary config file to make ansigenome work
 
     ansigenome scan --help
     scan a path containing Ansible roles and report back useful stats
@@ -158,8 +190,8 @@ At this point you can run any of the commands below.
     ansigenome genmeta --help
     augment existing meta files to be compatible with Ansigenome
 
-    ansigenome reqs --help
-    export a path of roles to a file to be consumed by ansible-galaxy install -r
+    ansigenome export --help
+    export roles to a dependency graph, requirements file and more
 
     ansigenome init --help
     init new roles with a custom meta file and tests
@@ -167,11 +199,17 @@ At this point you can run any of the commands below.
     ansigenome run --help
     run shell commands inside of each role's directory
 
-    ansigenome dump --help
-    dump a json file containing every stat it gathers from the scan path
+
+    Options:
+      --version   show program's version number and exit
+      -h, --help  show this help message and exit
+
+    ansigenome command --help for more info on a command
 
 Tips
 ````
+
+- Do not forget to check out the ``--help`` for each command
 
 -  ``scan``, ``gendoc``, ``genmeta`` and ``run`` don't require a roles path
     - It will try ``$PWD/playbooks/roles`` then ``$PWD``
@@ -179,10 +217,11 @@ Tips
 
 - You can write a config out to a custom path with ``-o <path>``
     - The non-home version of the config will be used if found
+    - Feel free to edit the config file by hand later to change values
 
-- The `reqs` command accepts a ``-v`` flag to interactively version each role
+- The ``export -t reqs`` command accepts a ``-v`` flag to read in a VERSION file
 
-- The `init` command accepts a ``-c`` flag
+- The ``init`` command accepts a ``-c`` flag
     - Supply a comma separated list of Galaxy categories
 
 - ``scan``, ``gendoc``, ``genmeta``, ``run`` and ``dump`` accept an ``-l`` flag
@@ -232,7 +271,6 @@ Here's the available variables you can use in your meta file or optional custom 
       galaxy_id   : String based ID to find your role on the Galaxy
       travis      : Boolean to determine if this role is on Travis-CI
       beta        : Boolean to mark this role as Beta
-      version     : String to store which version this role is at (unused atm)
 
       synopsis    : String block containing what your role does
       usage       : String block containing a detailed usage guide

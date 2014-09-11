@@ -12,30 +12,32 @@ import ansigenome.utils as utils
 
 CONFIG_TEMPLATE = """---
 
-author:
-  company: Acme Inc.
-  email: test@user.com
-  name: Test User
-  twitter: testuser
-  url: 'http://testuser'
+author_company: Acme Inc.
+author_email: test@user.com
+author_name: Test User
+author_twitter: testuser
+author_url: http://testuser
 
-license:
-  type: MIT
-  url: https://tldrlegal.com/license/mit-license
+license_type: MIT
+license_url: https://tldrlegal.com/license/mit-license
 
-options:
-  dump_with_readme: false
-  quiet: false
-  readme_template: ''
-  reqs_format: yml
-  travis: true
-  test_runner: 'http://foo'
+options_readme_template: ''
+options_travis: true
+options_quiet: false
+options_test_runner: http://foo
 
-scm:
-  host: https://github.com
-  repo_prefix: ansible-
-  type: git
-  user: testuser
+default_format_graph: dot
+default_format_reqs: txt
+default_format_dump: json
+
+scm_host: https://github.com
+scm_repo_prefix: ansible-
+scm_type: git
+scm_user: testuser
+
+graphviz_size: 15,8
+graphviz_dpi: 130
+graphviz_flags: ''
 """
 
 DEFAULTS_TEMPLATE = """---
@@ -48,7 +50,6 @@ list:
 
 
 # comment
- a spaced variable should not be counted
 baz: qux
 """
 

@@ -26,7 +26,7 @@ class Config(object):
             self.show_no_config_help()
 
         out_config = self.ask_questions()
-        self.write_config(out_config)
+        utils.write_config(self.config_path, out_config)
 
     def show_no_config_help(self):
         """
@@ -46,40 +46,38 @@ class Config(object):
         """
         Obtain config settings from the user.
         """
-        out_config = {
-            "author": {},
-            "license": {},
-            "scm": {},
-            "options": {},
-        }
+        out_config = {}
 
         for key in c.CONFIG_QUESTIONS:
             section = key[1]
             print
             for question in section:
                 answer = utils.ask(question[1], question[2])
-                out_config[key[0]][question[0]] = answer
+                out_config["{0}_{1}".format(key[0], question[0])] = answer
 
-        # Set a few default values.
-        test_runner = "https://github.com/nickjj/rolespec"
+        for key in c.CONFIG_MULTIPLE_CHOICE_QUESTIONS:
+            section = key[1]
+            print
+            # keep going until we get what we want
+            while True:
+                input = utils.ask(section[1], "")
+                if (input.isdigit() and
+                        int(input) > 0 and
+                        int(input) <= section[0]):
+                    answer = input
 
-        out_config["options"]["readme_template"] = ""
-        out_config["options"]["travis"] = True
-        out_config["options"]["quiet"] = False
-        out_config["options"]["test_runner"] = test_runner
+                    break
+                print
 
-        return out_config
+            # store the answer as 1 less than it is, we're dealing with
+            # a list to select the number which is 0 indexed
+            answer = int(input) - 1
 
-    def write_config(self, config):
-        """
-        Write the config with a little post-converting formatting.
-        """
-        config_as_string = utils.to_nice_yaml(config)
+            if key[0] == "license":
+                out_config["license_type"] = c.LICENSE_TYPES[answer][0]
+                out_config["license_url"] = c.LICENSE_TYPES[answer][1]
 
-        config_as_string = "---\n" + config_as_string
-        config_as_string = config_as_string.replace("author:", "\nauthor:")
-        config_as_string = config_as_string.replace("license:", "\nlicense:")
-        config_as_string = config_as_string.replace("scm:", "\nscm:")
-        config_as_string = config_as_string.replace("options:", "\noptions:")
+        # merge in defaults without asking questions
+        merged_config = dict(c.CONFIG_DEFAULTS.items() + out_config.items())
 
-        utils.string_to_file(self.config_path, config_as_string)
+        return merged_config

@@ -12,7 +12,6 @@ import ansigenome.utils as utils
 
 from ansigenome.config import Config
 from ansigenome.init import Init
-from ansigenome.reqs import Reqs
 from ansigenome.run import Run
 from ansigenome.scan import Scan
 
@@ -52,10 +51,14 @@ def build_option_parser(action):
     usage = ui.usage()
     epilog = ui.epilogue(os.path.basename(sys.argv[0]))
 
-    OptionParser.format_epilog = lambda self, formatter: self.epilog
-    parser = OptionParser(usage=usage, epilog=epilog)
+    args = " ".join(sys.argv)
+    version = utils.get_version(os.path.join(c.MODULE_DIR, "VERSION"))
 
-    if not action:
+    OptionParser.format_epilog = lambda self, formatter: self.epilog
+    parser = OptionParser(usage=usage, epilog=epilog,
+                          version="%prog {0}".format(version))
+
+    if not action and "--version" not in sys.argv:
         parser.print_help()
         sys.exit()
 
@@ -66,19 +69,49 @@ def build_option_parser(action):
     elif action == "scan":
         parser.set_usage("{0} ROLES_PATH".format(usage_prefix))
     elif action == "gendoc":
-        parser.set_usage("{0} ROLES_PATH ".format(usage_prefix))
+        parser.set_usage("{0} ROLES_PATH".format(usage_prefix))
     elif action == "genmeta":
-        parser.set_usage("{0} ROLES_PATH ".format(usage_prefix))
-    elif action == "reqs":
-        parser.set_usage("{0} ROLES_PATH [-o OUT_FILE] [-f FORMAT]"
-                         "[-v INTERACTIVE_VERSION]".format(usage_prefix))
+        parser.set_usage("{0} ROLES_PATH".format(usage_prefix))
+    elif action == "export":
+        # Adjust the help based on the export type
+        export_type = "graph"
+        formats = "dot | png"
+        usage = "[-s SIZE] [-d DPI] [-g FLAGS]"
+
+        if "-t reqs" in args or "--type reqs" in args:
+            export_type = "reqs"
+            formats = "txt | yml"
+            usage = "[-r READ_VERSION]"
+        elif "-t dump" in args or "--type dump" in args:
+            export_type = "dump"
+            formats = "json"
+            usage = ""
+
+        parser.set_usage("{0} ROLES_PATH [-t TYPE] "
+                         "[-f FORMAT] {1} [-o OUT_FILE]".format(usage_prefix,
+                                                                usage))
+        parser.add_option("-t", "--type",
+                          dest="type",
+                          default="graph",
+                          help="output types: graph (default) | reqs | dump")
         parser.add_option("-f", "--format",
                           dest="format",
-                          help="output format, overrides the config value")
-        parser.add_option("-v", "--interactive-version",
-                          dest="interactive_version",
-                          action="store_true",
-                          help="input the version for each role 1 by 1")
+                          help="output formats: {0}".format(formats))
+        if export_type == "graph":
+            parser.add_option("-s", "--size",
+                              dest="size",
+                              help="size of the graph: '15,8' (default)")
+            parser.add_option("-d", "--dpi",
+                              dest="dpi",
+                              help="dpi of the graph: 130 (default)")
+            parser.add_option("-g", "--flags",
+                              dest="flags",
+                              help="send custom flags to the graphviz command")
+        elif export_type == "reqs":
+            parser.add_option("-r", "--read-version",
+                              dest="read_version",
+                              action="store_true",
+                              help="read in the version from a VERSION file")
     elif action == "init":
         parser.set_usage("{0} ROLE_PATH "
                          "[-c GALAXY_CATEGORIES]".format(usage_prefix))
@@ -90,12 +123,10 @@ def build_option_parser(action):
                          (usage_prefix))
         parser.add_option("-m", "--command", dest="command",
                           help="execute this shell command on each role")
-    elif action == "dump":
-        parser.set_usage("{0} ROLES_PATH -o OUT_FILE ".format(usage_prefix))
-    if action in ("scan", "gendoc", "genmeta", "run", "dump"):
+    if action in ("scan", "gendoc", "genmeta", "export", "run"):
         parser.add_option("-l", "--limit", dest="limit",
                           help="comma separated string of roles to white list")
-    if action in ("config", "reqs", "dump"):
+    if action in ("config", "export"):
         parser.add_option("-o", "--out", dest="out_file",
                           help="output file path")
 
@@ -133,6 +164,14 @@ def execute_genmeta(args, options, config, parser):
     Scan(args, options, config, genmeta=True)
 
 
+def execute_export(args, options, config, parser):
+    """
+    Execute the export action.
+    """
+    check_roles_path(args, parser)
+    Scan(args, options, config, export=True)
+
+
 def execute_run(args, options, config, parser):
     """
     Execute the run action.
@@ -156,26 +195,6 @@ def execute_init(args, options, config, parser):
     Init(args, options, config)
 
 
-def execute_reqs(args, options, config, parser):
-    """
-    Execute the reqs action.
-    """
-    check_roles_path(args, parser)
-    Reqs(args, options, config)
-
-
-def execute_dump(args, options, config, parser):
-    """
-    Execute the dump action.
-    """
-    if options.out_file is None:
-        parser.print_help()
-        sys.exit()
-
-    check_roles_path(args, parser)
-    Scan(args, options, config, dump=True)
-
-
 def check_roles_path(args, parser):
     """
     Use the default role path or the user supplied roles path.
@@ -192,7 +211,7 @@ def check_roles_path(args, parser):
             roles_path = os.getcwd()
             found_path = True
     else:
-        roles_path = args[0]
+        roles_path = os.path.abspath(args[0])
 
     if not os.path.exists(roles_path):
         ui.error(c.MESSAGES["path_missing"], roles_path)
@@ -242,13 +261,32 @@ def validate_config(config, path):
     Enforce that certain keys exist in the config.
     """
     config_keys = utils.keys_in_dict(config, "", [])
-    default_config_keys = utils.keys_in_dict(c.CONFIG_MUST_CONTAIN, "", [])
+    default_config_keys = utils.keys_in_dict(c.CONFIG_DEFAULTS, "", [])
+    missing_keys = []
 
     for key in default_config_keys:
         if key not in config_keys:
-            ui.error(c.MESSAGES["invalid_config"].replace("%key", key),
-                     path)
-            sys.exit(1)
+            missing_keys.append(key)
+
+    if missing_keys:
+        merge_missing_config_keys(config, missing_keys, path)
+
+
+def merge_missing_config_keys(config, missing_keys, path):
+    """
+    Add any missing config keys to the config.
+    """
+    ui.warn(c.MESSAGES["config_upgraded"])
+    ui.ok(missing_keys)
+    print
+
+    config = utils.yaml_load(path)
+
+    # merge in empty keys, then add the real keys.
+    merged_config = dict(config.items() + c.CONFIG_DEFAULTS.items())
+    merged_config.update(config)
+
+    utils.write_config(path, merged_config)
 
 
 def main():
@@ -267,13 +305,16 @@ def main():
 
     # skip validating the config when generating a config
     if action != "config":
-        validate_config(config, config_path)
+        config = validate_config(config, config_path)
+
+    # reload the config
+    reloaded_config = utils.yaml_load(config_path)
 
     args = utils.stripped_args(args)
 
     if 1:
         fn = globals()["execute_%s" % action]
-        fn(args, options, config, parser)
+        fn(args, options, reloaded_config, parser)
 
 
 if __name__ == "__main__":

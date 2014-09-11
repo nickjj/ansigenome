@@ -54,6 +54,20 @@ def file_to_string(path):
         return contents.read()
 
 
+def file_to_list(path):
+    """
+    Return the contents of a file as a list when given a path.
+    """
+    if not os.path.exists(path):
+        ui.error(c.MESSAGES["path_missing"], path)
+        sys.exit(1)
+
+    with open(path, "r") as contents:
+        lines = contents.read().splitlines()
+
+    return lines
+
+
 def dict_to_json(input):
     """
     Return json from a dict.
@@ -290,13 +304,11 @@ def normalize_role(role, config):
     """
     Normalize a role name.
     """
-    scm = config["scm"]
-
-    if role.startswith(scm["repo_prefix"]):
-        role_name = role.replace(scm["repo_prefix"], "")
+    if role.startswith(config["scm_repo_prefix"]):
+        role_name = role.replace(config["scm_repo_prefix"], "")
     else:
         if "." in role:
-            galaxy_prefix = "{0}.".format(scm["user"])
+            galaxy_prefix = "{0}.".format(config["scm_user"])
             role_name = role.replace(galaxy_prefix, "")
         else:
             role_name = role
@@ -309,10 +321,10 @@ def create_meta_main(create_path, config, role, categories):
     Create a meta template.
     """
     meta_file = c.DEFAULT_META_FILE.replace(
-        "%author_name", config["author"]["name"])
+        "%author_name", config["author_name"])
     meta_file = meta_file.replace(
-        "%author_company", config["author"]["company"])
-    meta_file = meta_file.replace("%license_type", config["license"]["type"])
+        "%author_company", config["author_company"])
+    meta_file = meta_file.replace("%license_type", config["license_type"])
     meta_file = meta_file.replace("%role_name", role)
 
     # Normalize the category so %categories always gets replaced.
@@ -322,3 +334,27 @@ def create_meta_main(create_path, config, role, categories):
     meta_file = meta_file.replace("%categories", categories)
 
     string_to_file(create_path, meta_file)
+
+
+def get_version(path, default="master"):
+    """
+    Return the version from a VERSION file
+    """
+    version = default
+    if os.path.exists(path):
+        version_contents = file_to_string(path)
+        if version_contents:
+            version = version_contents.strip()
+
+    return version
+
+
+def write_config(path, config):
+    """
+    Write the config with a little post-converting formatting.
+    """
+    config_as_string = to_nice_yaml(config)
+
+    config_as_string = "---\n" + config_as_string
+
+    string_to_file(path, config_as_string)
