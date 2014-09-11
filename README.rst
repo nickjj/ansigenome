@@ -12,7 +12,7 @@ Ansigenome is a command line tool designed to help you manage your Ansible roles
 
 ****
 
-**Create dependency graphs in seconds (generated from `DebOps <http://debops.org)`_)**
+**Create dependency graphs in seconds (generated from `DebOps <http://debops.org>`_)**
 
 .. figure:: https://raw.githubusercontent.com/nickjj/ansigenome/master/docs/ansigenome-graph.png
    :alt: Ansigenome graph of DebOps
