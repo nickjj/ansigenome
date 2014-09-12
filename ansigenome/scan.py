@@ -498,7 +498,12 @@ ansigenome_info:
             "email": self.config["author_email"],
             "twitter": self.config["author_twitter"],
         }
-        scm = {}
+        scm = {
+            "host": self.config["scm_host"],
+            "repo_prefix": self.config["scm_repo_prefix"],
+            "type": self.config["scm_type"],
+            "user": self.config["scm_user"],
+        }
         license = {
             "type": self.config["license_type"],
             "url": self.config["license_url"],

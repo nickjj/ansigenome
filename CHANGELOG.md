@@ -1,3 +1,8 @@
+## v0.4.7
+
+- Add the SCM properties back to the README template
+  - This fixes templates not working
+
 ## v0.4.6
 
 - Attempt to fix the readme template's path in the data/ dir
