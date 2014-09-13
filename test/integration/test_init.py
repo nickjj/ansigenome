@@ -47,6 +47,8 @@ class TestInit(unittest.TestCase):
                                                    "hosts")), "expected " + \
                     "'{0}' to be created".format(folder)
 
+        assert os.path.exists(os.path.join(path, "VERSION"))
+
         meta = utils.file_to_string(meta_path)
 
         print
