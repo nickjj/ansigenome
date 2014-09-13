@@ -74,8 +74,8 @@ class Init(object):
         """
         Create the role's directory and file structure.
         """
-        utils.string_to_file(os.path.join(self.output_path, "VERSION\n"),
-                             "master")
+        utils.string_to_file(os.path.join(self.output_path, "VERSION"),
+                             "master\n")
 
         for folder in c.ANSIBLE_FOLDERS:
             create_folder_path = os.path.join(self.output_path, folder)
