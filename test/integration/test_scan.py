@@ -48,8 +48,8 @@ class TestScan(unittest.TestCase):
         self.assertIn("6 facts", out)
         self.assertIn("8 files", out)
         self.assertIn("26 files", out)
-        self.assertIn("94 lines", out)
-        self.assertIn("248 lines", out)
+        self.assertIn("88 lines", out)
+        self.assertIn("230 lines", out)
 
         self.assertIn("0 ok       3 missing readme(s)       " +
                       "0 missing meta(s)", out)

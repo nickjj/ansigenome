@@ -10,9 +10,6 @@ import utils as utils
 
 default_mainyml_template = """---
 
-# role: %role_name
-
-# %values go here
 """
 
 default_travisyml_template = """---
