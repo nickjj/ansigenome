@@ -41,12 +41,9 @@ class Scan(object):
 
         # only load and validate the readme when generating docs
         if self.gendoc:
-            if os.path.exists(config["options_readme_template"]):
-                readme_template = config["options_readme_template"]
-            else:
-                readme_template = c.README_TEMPLATE_PATH
-
-            self.readme_template = utils.template(readme_template)
+            extend_path = self.config["options_readme_template"]
+            self.readme_template = utils.template(c.README_TEMPLATE_PATH,
+                                                  extend_path)
 
         self.report = {
             "totals": {

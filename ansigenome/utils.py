@@ -7,10 +7,17 @@ import sys
 import urllib2
 import yaml
 
-from jinja2 import Template
+from jinja2 import DictLoader
+from jinja2.environment import Environment
 
 import constants as c
 import ui as ui
+
+
+class RelEnvironment(Environment):
+    """Override join_path() to enable relative template paths."""
+    def join_path(self, template, parent):
+        return os.path.join(os.path.dirname(parent), template)
 
 
 # ------------------------------------------------------------------------
@@ -88,20 +95,42 @@ def url_to_string(url):
     return page
 
 
-def template(source):
+def template(path, extend_path):
     """
-    Return a jinja2 template instance from a path or url.
+    Return a jinja2 template instance with extends support.
     """
-    if "://" in source:
-        contents = url_to_string(source)
+    files = []
+
+    # add the "extender" template when it exists
+    if len(extend_path) > 0:
+        # determine the base readme path
+        base_path = os.path.dirname(extend_path)
+        new_base_path = os.path.join(base_path, "README.md.j2")
+
+        if os.path.exists(new_base_path):
+            path = new_base_path
+
+        if os.path.exists(extend_path):
+            files = [path, extend_path]
+        else:
+            ui.error(c.MESSAGES["template_extender_missing"])
+            ui.error(extend_path)
+            sys.exit(1)
     else:
-        contents = file_to_string(source)
+        files = [path]
 
     try:
-        return Template(contents)
+        # Use the subclassed relative environment class
+        env = RelEnvironment()
+
+        # create a dictionary of templates
+        templates = dict((name, open(name, "rb").read()) for name in files)
+        env.loader = DictLoader(templates)
+
+        # return the final result (the last template in the list)
+        return env.get_template(files[len(files) - 1])
     except Exception as err:
-        file = os.path.basename(source)
-        ui.error(c.MESSAGES["template_error"].replace("%file", file), err)
+        ui.error(c.MESSAGES["template_error"], err)
         sys.exit(1)
 
 

@@ -65,7 +65,8 @@ When I started to get to about 5 roles I dreaded making readmes for each one bec
 
 ``ansigenome gendoc`` will do the same as ``scan`` except it will read your ``meta/main.yml`` file and generate a readme based on the stats it found and also format your readme based on a jinja2 template.
 
-You can use the default template or optionally supply a path/url to a custom template if you want to make it more personal, no problem.
+You can use the default template or optionally supply a custom template using
+blocks to customize the entire readme to your liking.
 
 Will it change my roles?
 ````````````````````````
@@ -217,6 +218,10 @@ Tips
 
 - Do not forget to check out the ``--help`` for each command
 
+- Learn how jinja2 extends works, you can use it for the readme template
+    - You're best off copying the base README and place it next to the custom j2
+    - Then you can ``{% extends "README.md.j2" %}``
+
 -  ``scan``, ``gendoc``, ``genmeta`` and ``run`` don't require a roles path
     - It will try ``$PWD/playbooks/roles`` then ``$PWD``
     - This allows you to run Ansigenome from your roles path easily
@@ -289,9 +294,30 @@ You can find many meta example files at the `DebOps project <https://github.com/
 Custom readme template
 ``````````````````````
 
-You might decide that the current template doesn't suite your style. That's completely reasonable. You can supply your own readme template.
+You might decide that the current template doesn't suite your style. That's completely reasonable. You can supply your own readme template and extend the base one.
 
-Just add the path to the custom readme template to your config file. It can be either a local path or URL.
+Just add the path to the custom readme template to your config file. Then copy the base template from this repo to somewhere on your workstation, perhaps next to your custom template.
+
+Then in your custom template you can extend it like this:
+
+::
+
+   {% extends "README.md.j2" %}
+
+   <insert the blocks you want to replace here>
+
+Available blocks to replace
+---------------------------
+
+- title
+- badges
+- beta
+- synopsis
+- installation
+- dependencies
+- usage
+- authors
+- footer
 
 Contributing
 ~~~~~~~~~~~~
