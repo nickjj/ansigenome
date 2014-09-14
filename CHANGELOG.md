@@ -1,3 +1,7 @@
+## v0.4.8
+
+- The custom readme template is now customized by replacing the file or blocks
+
 ## v0.4.7
 
 - Add the SCM properties back to the README template
