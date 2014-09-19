@@ -1,3 +1,10 @@
+## v0.5.0
+
+- Support both RST and MD readme generation
+  - This is now a config option
+- Fix duplicate dependencies in the gendoc output
+- Strip all whitespace from jinaj2 tags in the output
+
 ## v0.4.8
 
 - The custom readme template is now customized by replacing the file or blocks
