@@ -24,7 +24,7 @@ class TestTemplates(unittest.TestCase):
         role_name = role[0]
 
         role_path = os.path.join(self.test_path, role_name)
-        readme_path = os.path.join(role_path, "README.md")
+        readme_path = os.path.join(role_path, "README.rst")
         defaults_path = os.path.join(self.test_path, role_name,
                                      "defaults", "main.yml")
         tasks_path = os.path.join(self.test_path, role_name,

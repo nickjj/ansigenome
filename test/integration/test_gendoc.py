@@ -22,7 +22,7 @@ class TestGendoc(unittest.TestCase):
     def test_gendoc(self):
         all_readmes = {}
         idempotency_tag = "_idem"
-        relative_readme_path = "README.md"
+        relative_readme_path = "README.rst"
         relative_meta_path = os.path.join("meta", "main.yml")
 
         role_names = th.create_roles(self.test_path, 3)

@@ -70,7 +70,11 @@ def build_option_parser(action):
     elif action == "scan":
         parser.set_usage("{0} ROLES_PATH".format(usage_prefix))
     elif action == "gendoc":
-        parser.set_usage("{0} ROLES_PATH".format(usage_prefix))
+        parser.set_usage("{0} ROLES_PATH [-f FORMAT]".format(usage_prefix))
+        parser.add_option("-f", "--format",
+                          dest="format",
+                          default="rst",
+                          help="output formats: rst | md")
     elif action == "genmeta":
         parser.set_usage("{0} ROLES_PATH".format(usage_prefix))
     elif action == "export":

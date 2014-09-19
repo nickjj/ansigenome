@@ -95,7 +95,7 @@ def url_to_string(url):
     return page
 
 
-def template(path, extend_path):
+def template(path, extend_path, out):
     """
     Return a jinja2 template instance with extends support.
     """
@@ -105,7 +105,7 @@ def template(path, extend_path):
     if len(extend_path) > 0:
         # determine the base readme path
         base_path = os.path.dirname(extend_path)
-        new_base_path = os.path.join(base_path, "README.md.j2")
+        new_base_path = os.path.join(base_path, "README.{0}.j2".format(out))
 
         if os.path.exists(new_base_path):
             path = new_base_path

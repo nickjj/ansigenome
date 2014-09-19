@@ -26,6 +26,7 @@ options_travis: true
 options_quiet: false
 options_test_runner: http://foo
 
+default_format_gendoc: rst
 default_format_graph: dot
 default_format_reqs: txt
 default_format_dump: json

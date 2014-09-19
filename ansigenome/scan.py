@@ -23,6 +23,9 @@ class Scan(object):
         self.genmeta = genmeta
         self.export = export
 
+        # set the readme output format
+        self.readme_format = c.ALLOWED_GENDOC_FORMATS[0]
+
         self.roles = utils.roles_dict(self.roles_path, "")
 
         if self.options.limit:
@@ -41,9 +44,19 @@ class Scan(object):
 
         # only load and validate the readme when generating docs
         if self.gendoc:
+            # only change the format if it is different than the default
+            if not self.options.format == self.readme_format:
+                self.readme_format = self.options.format
+
             extend_path = self.config["options_readme_template"]
-            self.readme_template = utils.template(c.README_TEMPLATE_PATH,
-                                                  extend_path)
+
+            if self.readme_format == "rst":
+                readme_source = c.README_RST_TEMPLATE_PATH
+            else:
+                readme_source = c.README_MD_TEMPLATE_PATH
+
+            self.readme_template = utils.template(readme_source, extend_path,
+                                                  self.readme_format)
 
         self.report = {
             "totals": {
@@ -96,7 +109,8 @@ class Scan(object):
             self.paths["meta"] = os.path.join(self.paths["role"], "meta",
                                               "main.yml")
             self.paths["readme"] = os.path.join(self.paths["role"],
-                                                "README.md")
+                                                "README.{0}"
+                                                .format(self.readme_format))
             self.paths["defaults"] = os.path.join(self.paths["role"],
                                                   "defaults", "main.yml")
 

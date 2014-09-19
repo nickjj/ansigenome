@@ -12,6 +12,7 @@ PACKAGE_RESOURCE = pkg_resources.resource_filename(__name__, "data")
 VALID_ACTIONS = ("config", "scan", "gendoc", "genmeta",
                  "export", "init", "run")
 
+ALLOWED_GENDOC_FORMATS = ("rst", "md")
 ALLOWED_GRAPH_FORMATS = ("png", "dot")
 ALLOWED_REQS_FORMATS = ("txt", "yml")
 ALLOWED_DUMP_FORMATS = ("json")
@@ -85,6 +86,7 @@ CONFIG_DEFAULTS = {
     "options_travis": True,
     "options_quiet": False,
     "options_test_runner": "https://github.com/nickjj/rolespec",
+    "default_format_gendoc": ALLOWED_GENDOC_FORMATS[0],
     "default_format_graph": ALLOWED_GRAPH_FORMATS[0],
     "default_format_reqs": ALLOWED_REQS_FORMATS[0],
     "default_format_dump": ALLOWED_DUMP_FORMATS,
@@ -96,7 +98,8 @@ CONFIG_DEFAULTS = {
 ANSIBLE_FOLDERS = ("defaults", "handlers", "meta",
                    "tasks", "templates", "tests", "vars")
 
-README_TEMPLATE_PATH = os.path.join(PACKAGE_RESOURCE, "README.md.j2")
+README_RST_TEMPLATE_PATH = os.path.join(PACKAGE_RESOURCE, "README.rst.j2")
+README_MD_TEMPLATE_PATH = os.path.join(PACKAGE_RESOURCE, "README.md.j2")
 
 DEFAULT_META_FILE = """---
 
