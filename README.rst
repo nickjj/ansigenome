@@ -65,6 +65,8 @@ When I started to get to about 5 roles I dreaded making readmes for each one bec
 
 ``ansigenome gendoc`` will do the same as ``scan`` except it will read your ``meta/main.yml`` file and generate a readme based on the stats it found and also format your readme based on a jinja2 template.
 
+It can generate both RST and MD readmes.
+
 You can use the default template or optionally supply a custom template using
 blocks to customize the entire readme to your liking.
 
@@ -221,6 +223,8 @@ Tips
 - Learn how jinja2 extends works, you can use it for the readme template
     - You're best off copying the base README and place it next to the custom j2
     - Then you can ``{% extends "README.md.j2" %}``
+
+- ``gendoc`` accepts ``-f md`` to generate markdown readmes instead of rst
 
 -  ``scan``, ``gendoc``, ``genmeta`` and ``run`` don't require a roles path
     - It will try ``$PWD/playbooks/roles`` then ``$PWD``
