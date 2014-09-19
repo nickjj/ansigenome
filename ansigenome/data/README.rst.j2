@@ -52,7 +52,6 @@ This role requires at least Ansible{% if galaxy_info.min_ansible_version is defi
 ::
 
     ansible-galaxy install {{ role.galaxy_name }}
-
 {% endblock %}
 {% endif %}
 
@@ -60,6 +59,7 @@ This role requires at least Ansible{% if galaxy_info.min_ansible_version is defi
 {% block dependencies %}
 Role dependencies
 ~~~~~~~~~~~~~~~~~
+
 {% for dependency in dependencies | unique_dict("role") %}
 - ``{{ dependency.role | trim }}``{% endfor %}
 {% endblock %}
