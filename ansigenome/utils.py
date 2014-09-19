@@ -123,6 +123,12 @@ def template(path, extend_path):
         # Use the subclassed relative environment class
         env = RelEnvironment()
 
+        # Add a unique dict filter, by key
+        def unique_dict(items, key):
+            return {v[key]: v for v in items}.values()
+
+        env.filters["unique_dict"] = unique_dict
+
         # create a dictionary of templates
         templates = dict((name, open(name, "rb").read()) for name in files)
         env.loader = DictLoader(templates)
