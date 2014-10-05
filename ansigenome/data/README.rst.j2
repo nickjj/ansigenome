@@ -61,7 +61,8 @@ Role dependencies
 ~~~~~~~~~~~~~~~~~
 
 {% for dependency in dependencies | unique_dict("role") %}
-- ``{{ dependency.role | trim }}``{% endfor %}
+- ``{{ dependency.role | trim }}``
+{% endfor %}
 {% endblock %}
 {% endif %}
 
