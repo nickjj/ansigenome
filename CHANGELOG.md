@@ -1,3 +1,8 @@
+## v0.5.1
+
+- Fix the Ansible version output in the rst template
+- Fix the dependency list in the rst template
+
 ## v0.5.0
 
 - Support both RST and MD readme generation
