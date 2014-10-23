@@ -121,7 +121,7 @@ def template(path, extend_path, out):
 
     try:
         # Use the subclassed relative environment class
-        env = RelEnvironment(trim_blocks=True, lstrip_blocks=True)
+        env = RelEnvironment(trim_blocks=True)
 
         # Add a unique dict filter, by key
         def unique_dict(items, key):
