@@ -62,10 +62,10 @@ CONFIG_QUESTIONS = [
 CONFIG_MULTIPLE_CHOICE_QUESTIONS = [
     (
         "license", (
-            [9, "Pick a license type by choosing a number:\n\n" +
+            [8, "Pick a license type by choosing a number:\n\n" +
              "  1. MIT\n  2. GPLv2\n  3. GPLv3\n" +
-             "  5. LGPL\n  6. Apache-2.0\n" +
-             "  7. BSDv2\n  8. BSDv3\n  9. Other\n\n"]
+             "  4. LGPL\n  5. Apache-2.0\n" +
+             "  6. BSDv2\n  7. BSDv3\n  8. Other\n\n"]
         )
     ),
 ]
