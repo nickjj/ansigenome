@@ -1,3 +1,8 @@
+## v0.5.2
+
+- Remove dependency on Jinja 2.7+
+- Fix a crash when selecting "Other" license
+
 ## v0.5.1
 
 - Fix the Ansible version output in the rst template
