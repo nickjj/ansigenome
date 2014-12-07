@@ -1,3 +1,7 @@
+## v0.5.3
+
+- Fix version conflict with PyPi
+
 ## v0.5.2
 
 - Remove dependency on Jinja 2.7+
