@@ -96,7 +96,7 @@ CONFIG_DEFAULTS = {
 }
 
 ANSIBLE_FOLDERS = ("defaults", "handlers", "meta",
-                   "tasks", "templates", "tests", "vars")
+                   "tasks", "templates", "tests", "vars", "files")
 
 README_RST_TEMPLATE_PATH = os.path.join(PACKAGE_RESOURCE, "README.rst.j2")
 README_MD_TEMPLATE_PATH = os.path.join(PACKAGE_RESOURCE, "README.md.j2")

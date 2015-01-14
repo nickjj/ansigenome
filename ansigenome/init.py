@@ -85,7 +85,7 @@ class Init(object):
 
             out_path = os.path.join(create_folder_path, "main.yml")
 
-            if folder not in ("templates", "meta", "tests"):
+            if folder not in ("templates", "meta", "tests", "files"):
                 utils.string_to_file(out_path, mainyml_template)
 
             if folder == "meta":
