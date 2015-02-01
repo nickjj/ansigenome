@@ -3,7 +3,7 @@
 
 {% block title %}
 {{ role.name }}
-{{ "=" * title_length }} 
+{{ "=" * title_length }}
 {% endblock %}
 
 {% block badges %}
@@ -12,9 +12,9 @@
 {% if ansigenome_info.travis is defined and ansigenome_info.travis %}
 .. |Travis CI| image:: http://img.shields.io/travis/{{ scm.user + '/' + role.slug }}.svg?style=flat
    :target: http://travis-ci.org/{{ scm.user + '/' + role.slug }}
-{% endif %} 
+{% endif %}
 {% if ansigenome_info.galaxy_id is defined and ansigenome_info.galaxy_id %}
-.. |Ansible Galaxy| image:: http://img.shields.io/badge/galaxy-{{ role.galaxy_name }}-660198.svg?style=flat
+.. |Ansible Galaxy| image:: http://img.shields.io/badge/galaxy-{{ role.galaxy_name | replace('-', '–')}}-660198.svg?style=flat
    :target: https://galaxy.ansible.com/list#/roles/{{ ansigenome_info.galaxy_id }}
 {% endif %}
 {% if galaxy_info.platforms is defined and galaxy_info.platforms %}
