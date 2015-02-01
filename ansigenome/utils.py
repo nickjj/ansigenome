@@ -131,7 +131,9 @@ def template(path, extend_path, out):
         env.filters["unique_dict"] = unique_dict
 
         # create a dictionary of templates
-        templates = dict((name, codecs.open(name, "rb", 'UTF-8').read()) for name in files)
+        templates = dict(
+            (name, codecs.open(name, "rb", 'UTF-8').read())
+            for name in files)
         env.loader = DictLoader(templates)
 
         # return the final result (the last template in the list)
