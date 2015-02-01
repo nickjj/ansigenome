@@ -1,3 +1,4 @@
+import codecs
 import errno
 import json
 import os
@@ -45,7 +46,7 @@ def string_to_file(path, input):
     """
     mkdir_p(os.path.dirname(path))
 
-    with open(path, "w+") as file:
+    with codecs.open(path, "w+", "UTF-8") as file:
         file.write(input)
 
 
@@ -57,7 +58,7 @@ def file_to_string(path):
         ui.error(c.MESSAGES["path_missing"], path)
         sys.exit(1)
 
-    with open(path, "r") as contents:
+    with codecs.open(path, "r", "UTF-8") as contents:
         return contents.read()
 
 
@@ -69,7 +70,7 @@ def file_to_list(path):
         ui.error(c.MESSAGES["path_missing"], path)
         sys.exit(1)
 
-    with open(path, "r") as contents:
+    with codecs.open(path, "r", "UTF-8") as contents:
         lines = contents.read().splitlines()
 
     return lines
@@ -130,7 +131,7 @@ def template(path, extend_path, out):
         env.filters["unique_dict"] = unique_dict
 
         # create a dictionary of templates
-        templates = dict((name, open(name, "rb").read()) for name in files)
+        templates = dict((name, codecs.open(name, "rb", 'UTF-8').read()) for name in files)
         env.loader = DictLoader(templates)
 
         # return the final result (the last template in the list)
