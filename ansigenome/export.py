@@ -136,7 +136,8 @@ digraph role_dependencies {
                 for dependency in sorted(fields["dependencies"]):
                     dependency_name = utils.role_name(dependency)
                     dependencies += "        role_{0} -> role_{1}\n" \
-                                    .format(name, dependency_name)
+                                    .format(name, utils.normalize_role(
+                                            dependency_name, self.config))
 
                 edges += "{0}{1}\n".format(edge, dependencies)
 
