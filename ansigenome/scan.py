@@ -210,7 +210,10 @@ class Scan(object):
             dep_list = []
 
             for dependency in meta_dict["dependencies"]:
-                dep_list.append(dependency["role"])
+                if type(dependency) is dict:
+                    dep_list.append(dependency["role"])
+                else:
+                    dep_list.append(dependency)
 
             # unique set of dependencies
             meta_dict["dependencies"] = list(set(dep_list))
