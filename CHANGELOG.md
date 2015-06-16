@@ -1,3 +1,7 @@
+## v0.5.4
+
+- Role names with `-` can now be exported
+
 ## v0.5.3
 
 - Fix version conflict with PyPi
