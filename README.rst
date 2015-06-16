@@ -1,4 +1,4 @@
-|PyPI version| |PyPI downloads| |Build status|
+|PyPI version| |Build status|
 
 Ansigenome
 ==========
@@ -343,8 +343,6 @@ License
 `GPLv3 <https://www.gnu.org/licenses/quick-guide-gplv3.html>`_
 
 .. |PyPI version| image:: https://badge.fury.io/py/ansigenome.png
-   :target: https://pypi.python.org/pypi/ansigenome
-.. |PyPI downloads| image:: https://pypip.in/d/ansigenome/badge.png
    :target: https://pypi.python.org/pypi/ansigenome
 .. |Build status| image:: https://secure.travis-ci.org/nickjj/ansigenome.png
    :target: https://travis-ci.org/nickjj/ansigenome
