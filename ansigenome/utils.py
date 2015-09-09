@@ -4,9 +4,12 @@ import json
 import os
 import re
 import subprocess
-import sys
 import urllib2
 import yaml
+
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 from jinja2 import DictLoader
 from jinja2.environment import Environment
