@@ -1,3 +1,8 @@
+## v0.5.5
+
+- Fix unicode issues
+- Enable syntax highlighting in defaults/main.yml
+
 ## v0.5.4
 
 - Role names with `-` can now be exported
