@@ -1,4 +1,5 @@
 {%- set author = authors | first -%}
+
 {% block title %}
 ## {{ role.name }}
 {% endblock %}
@@ -51,8 +52,10 @@ ansible-galaxy install {{ role.galaxy_name }}
 {% endfor %}
 {% endblock %}
 {% endif %}
-
+{% block standalone %}
+{% endblock %}
 {% if ansigenome_info.defaults is defined and ansigenome_info.defaults %}
+{% block defaults %}
 
 ### Role variables
 
@@ -61,12 +64,14 @@ List of default variables available in the inventory:
 ```YAML
 {{ ansigenome_info.defaults | trim }}
 ```
+{% endblock %}
 {% endif %}
 
 {% if ansigenome_info.facts is defined and ansigenome_info.facts %}
+{% block facts %}
 List of internal variables used by the role:
 
-{{ ansigenome_info.facts | trim | indent(4, true) }}{% endif %}
+{{ ansigenome_info.facts | trim | indent(4, true) }}{% endblock %}{% endif %}
 
 {% if ansigenome_info.usage is defined and ansigenome_info.usage %}
 {% block usage %}
@@ -86,7 +91,9 @@ List of internal variables used by the role:
 `{{ role.name }}` role was written by:
 {% for credit in authors %}
 - {% if credit.url is defined and credit.url %}[{% endif %}{{ credit.name }}{% if credit.url is defined and credit.url %}]({{ credit.url }}){% endif %}{% if credit.email is defined and credit.email %} | [e-mail](mailto:{{ credit.email }}){% endif %}{% if credit.twitter is defined and credit.twitter %} | [Twitter](https://twitter.com/{{ credit.twitter }}){% endif %}{% if credit.github is defined and credit.github %} | [GitHub](https://github.com/{{ credit.github }}){% endif %}
+
 {% endfor %}
+
 License: [{{ license.type | trim }}]({{ license.url | trim }})
 {% endblock %}
 
