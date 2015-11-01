@@ -22,6 +22,8 @@ LICENSE_TYPES = [
     ["GPLv2", "https://tldrlegal.com/license/gnu-general-public-license-v2"],
     ["GPLv3", "https://tldrlegal.com/license/" +
               "gnu-general-public-license-v3-%28gpl-3%29"],
+    ["AGPLv3", "https://tldrlegal.com/license/" +
+               "gnu-affero-general-public-license-v3-%28agpl-3.0%29"],
     ["LGPL", "https://tldrlegal.com/license/" +
              "gnu-lesser-general-public-license-v2.1-(lgpl-2.1)"],
     ["Apache-2.0", "https://tldrlegal.com/license/" +
@@ -62,10 +64,10 @@ CONFIG_QUESTIONS = [
 CONFIG_MULTIPLE_CHOICE_QUESTIONS = [
     (
         "license", (
-            [8, "Pick a license type by choosing a number:\n\n" +
+            [9, "Pick a license type by choosing a number:\n\n" +
              "  1. MIT\n  2. GPLv2\n  3. GPLv3\n" +
-             "  4. LGPL\n  5. Apache-2.0\n" +
-             "  6. BSDv2\n  7. BSDv3\n  8. Other\n\n"]
+             "  4. AGPLv3\n  5. LGPL\n  6. Apache-2.0\n" +
+             "  7. BSDv2\n  8. BSDv3\n  9. Other\n\n"]
         )
     ),
 ]
