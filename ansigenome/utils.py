@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import codecs
 import errno
 import json
@@ -6,6 +8,7 @@ import re
 import subprocess
 import urllib2
 import yaml
+#  import collections
 
 import sys
 reload(sys)
@@ -127,11 +130,28 @@ def template(path, extend_path, out):
         # Use the subclassed relative environment class
         env = RelEnvironment(trim_blocks=True)
 
-        # Add a unique dict filter, by key
+        # Add a unique dict filter, by key.
+        # Try to use normal filters as known from Jinja and Ansible instead of
+        # this custom one. This filter is included in Ansigenome for backwards
+        # compatibility reasons.
         def unique_dict(items, key):
             return {v[key]: v for v in items}.values()
 
         env.filters["unique_dict"] = unique_dict
+
+        def unique(a):
+
+            # Don’t use that in Ansigenome as it resorts the role dependencies.
+            # if isinstance(a,collections.Hashable):
+            #     c = set(a)
+
+            c = []
+            for x in a:
+                if x not in c:
+                    c.append(x)
+            return c
+
+        env.filters["unique"] = unique
 
         # create a dictionary of templates
         templates = dict(

@@ -65,8 +65,8 @@ This role requires at least Ansible{% if galaxy_info.min_ansible_version is defi
 Role dependencies
 ~~~~~~~~~~~~~~~~~
 
-{% for dependency in dependencies | unique_dict("role") %}
-- ``{{ dependency.role | trim }}``
+{% for role_dependency_name in dependencies | map(attribute='role') | unique %}
+- ``{{ role_dependency_name | trim }}``
 {% endfor %}
 {% endblock %}
 {% endif %}
