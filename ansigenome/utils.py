@@ -131,9 +131,8 @@ def template(path, extend_path, out):
         env = RelEnvironment(trim_blocks=True)
 
         # Add a unique dict filter, by key.
-        # Try to use normal filters as known from Jinja and Ansible instead of
-        # this custom one. This filter is included in Ansigenome for backwards
-        # compatibility reasons.
+        # DEPRECATION WARNING: This is only used for backwards compatibility,
+        #                      please use the unique filter instead.
         def unique_dict(items, key):
             return {v[key]: v for v in items}.values()
 
@@ -141,7 +140,9 @@ def template(path, extend_path, out):
 
         def unique(a):
 
-            # Don’t use that in Ansigenome as it resorts the role dependencies.
+            # Don’t use the following commented out optimization which is used
+            # in ansible/lib/ansible/plugins/filter/mathstuff.py in Ansigenome
+            # as it resorts the role dependencies:
             # if isinstance(a,collections.Hashable):
             #     c = set(a)
 
