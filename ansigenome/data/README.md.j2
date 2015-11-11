@@ -47,8 +47,8 @@ ansible-galaxy install {{ role.galaxy_name }}
 {% block dependencies %}
 ### Role dependencies
 
-{% for dependency in dependencies | unique_dict("role") %}
-- `{{ dependency.role | trim }}`
+{% for role_dependency_name in dependencies | map(attribute='role') | unique %}
+- `{{ role_dependency_name | trim }}`
 {% endfor %}
 {% endblock %}
 {% endif %}

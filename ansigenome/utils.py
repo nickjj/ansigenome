@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import codecs
 import errno
 import json
@@ -6,6 +8,7 @@ import re
 import subprocess
 import urllib2
 import yaml
+#  import collections
 
 import sys
 reload(sys)
@@ -127,11 +130,29 @@ def template(path, extend_path, out):
         # Use the subclassed relative environment class
         env = RelEnvironment(trim_blocks=True)
 
-        # Add a unique dict filter, by key
+        # Add a unique dict filter, by key.
+        # DEPRECATION WARNING: This is only used for backwards compatibility,
+        #                      please use the unique filter instead.
         def unique_dict(items, key):
             return {v[key]: v for v in items}.values()
 
         env.filters["unique_dict"] = unique_dict
+
+        def unique(a):
+
+            # Don’t use the following commented out optimization which is used
+            # in ansible/lib/ansible/plugins/filter/mathstuff.py in Ansigenome
+            # as it resorts the role dependencies:
+            # if isinstance(a,collections.Hashable):
+            #     c = set(a)
+
+            c = []
+            for x in a:
+                if x not in c:
+                    c.append(x)
+            return c
+
+        env.filters["unique"] = unique
 
         # create a dictionary of templates
         templates = dict(
