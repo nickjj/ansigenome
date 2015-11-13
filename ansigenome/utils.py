@@ -375,7 +375,13 @@ def normalize_role(role, config):
         else:
             role_name = role
 
-    return role_name.replace("-", "_")
+    # It is not recommended to use hyphen in role names (see
+    # https://github.com/nickjj/ansigenome/pull/19#issuecomment-75597850) But
+    # when you know what you are doing they can be used and are valid as far as
+    # Ansible Galaxy is concerned.
+    #  role_name = role_name.replace("-", "_")
+
+    return role_name
 
 
 def create_meta_main(create_path, config, role, categories):
