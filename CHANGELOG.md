@@ -1,3 +1,16 @@
+## v0.5.6
+
+- Fixed `Warning: <stdin>: syntax error in line XX near '-'` error https://github.com/davidlind/ansigenome/commit/a5294e139c4926df627f05cc8bcae86806e85b4c
+- Allow hyphens in role names https://github.com/nickjj/ansigenome/commit/033fe1eabb559b63e430fdc866563b05e7864044
+- Add line breaks to split up multiple role authors and the license https://github.com/nickjj/ansigenome/commit/d3abf5ed0c0ad68a7f09d1830c3e5ac0031c2671
+- Ensure role dependencies stay in the correct order https://github.com/nickjj/ansigenome/commit/7aab032c2e2deae095bee83ba972bf1a843de51a
+- Replace `-` with `--` in README templates https://github.com/nickjj/ansigenome/commit/ec049ff9baeffb4b44d71a8c08fec3e1b094b381
+- Add support for the AGPLv3 license https://github.com/nickjj/ansigenome/commit/bfdb24fbcc3b450cd57cca76ee54f67e2172cf20
+- Fix line breaks for the license in the README https://github.com/nickjj/ansigenome/commit/7ece25b6b0380411ba7c3fc0c0db0e5091052358
+- Fix line breaks in the README when roles have multiple dependencies https://github.com/nickjj/ansigenome/commit/a1bb4b9c9fa6edb0c984956c1ee390406f5f48bc
+- Update role URLs for the new Ansible Galaxy https://github.com/nickjj/ansigenome/commit/d81206ecfaae486227fbf3a395007d1cf9c6bb0f
+- Add `ansigenome_block` to README templates https://github.com/nickjj/ansigenome/commit/d1cd7f664f0c0fb4f007aafbf4a21fc35fabe66d
+
 ## v0.5.5
 
 - Fix unicode issues
