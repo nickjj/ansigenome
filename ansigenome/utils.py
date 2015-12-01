@@ -373,12 +373,7 @@ def normalize_role(role, config):
             galaxy_prefix = "{0}.".format(config["scm_user"])
             role_name = role.replace(galaxy_prefix, "")
         elif "-" in role:
-        # It is not recommended to use a hyphen in role names (see
-        # https://github.com/nickjj/ansigenome/pull/19#issuecomment-75597850) But
-        # when you know what you are doing they can be used and are valid as far as
-        # Ansible Galaxy is concerned.
-        #  role_name = role_name.replace("-", "_")
-	    role_name = role.replace("-", "_")
+            role_name = role.replace("-", "_")
         else:
             role_name = role
 
