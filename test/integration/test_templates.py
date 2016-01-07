@@ -62,5 +62,7 @@ class TestTemplates(unittest.TestCase):
         self.assertIn("ansigenome", readme)
         self.assertIn("galaxy.ansible.com", readme)
         self.assertNotIn("BETA", readme)
+        self.assertNotIn("beta", readme)
+        self.assertNotIn("deprecated", readme)
         self.assertNotIn("galaxy-install", readme)
         self.assertNotIn("twitter", readme)
