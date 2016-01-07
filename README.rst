@@ -285,7 +285,10 @@ Here's the available variables you can use in your meta file or optional custom 
       # ansigenome_info fields.
       galaxy_id   : String based ID to find your role on the Galaxy
       travis      : Boolean to determine if this role is on Travis-CI
-      beta        : Boolean to mark this role as Beta
+
+      status      : Dictionary with info about the status
+         name        : String, currently supported are: beta, deprecated
+         note        : String containing additional information about the status
 
       synopsis    : String block containing what your role does
       usage       : String block containing a detailed usage guide
@@ -314,11 +317,17 @@ Available blocks to replace
 ---------------------------
 
 - title
+- ansigenome_managed
 - badges
+- status
 - beta
+- deprecated
 - synopsis
 - installation
 - dependencies
+- standalone
+- defaults
+- facts
 - usage
 - authors
 - footer
