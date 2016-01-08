@@ -10,8 +10,16 @@
 {% endblock %}
 
 {% block badges %}
-{% if ansigenome_info.travis|d() %}[![Travis CI](http://img.shields.io/travis/{{ scm.user + '/' + role.slug }}.svg?style=flat)](http://travis-ci.org/{{ scm.user + '/' + role.slug }}){% endif %} {% if ansigenome_info.galaxy_id|d() %} [![Ansible Galaxy](http://img.shields.io/badge/galaxy-{{ role.galaxy_name | replace('-', '--')}}-660198.svg?style=flat)](https://galaxy.ansible.com/detail#/role/{{ ansigenome_info.galaxy_id }}){% endif %}{% if galaxy_info.platforms|d() %} [![Platforms](http://img.shields.io/badge/platforms-{{ galaxy_info.platforms | map(attribute='name') | sort | join('%20/%20') | lower }}-lightgrey.svg?style=flat)](#){% endif %}
-{% endblock %}
+{% if ansigenome_info.travis|d() %}
+[![Travis CI](http://img.shields.io/travis/{{ scm.user + '/' + role.slug }}.svg?style=flat)](http://travis-ci.org/{{ scm.user + '/' + role.slug }})
+{% endif %}
+{% if ansigenome_info.galaxy_id|d() %}
+[![Ansible Galaxy](http://img.shields.io/badge/galaxy-{{ role.galaxy_name | replace('-', '--')}}-660198.svg?style=flat)](https://galaxy.ansible.com/detail#/role/{{ ansigenome_info.galaxy_id }})
+{% endif %}
+{% if galaxy_info.platforms|d() %}
+[![Platforms](http://img.shields.io/badge/platforms-{{ galaxy_info.platforms | map(attribute='name') | sort | join('%20/%20') | lower }}-lightgrey.svg?style=flat)](#)
+{% endif %}
+{%- endblock %}
 
 {% if ansigenome_info.status|d() is mapping or ansigenome_info.beta|d() %}
 {% block status %}
