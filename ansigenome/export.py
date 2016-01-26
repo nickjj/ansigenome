@@ -138,7 +138,10 @@ digraph role_dependencies {
                     dependency_name = utils.role_name(dependency)
                     dependencies += "        role_{0} -> role_{1}\n".format(
                         re.sub(r'[.-/]', '_', name),
-                        re.sub(r'[.-/]', '_', utils.normalize_role(dependency_name, self.config))
+                        re.sub(r'[.-/]', '_',
+                               utils.normalize_role(dependency_name,
+                                                    self.config)
+                               )
                     )
 
                 edges += "{0}{1}\n".format(edge, dependencies)

@@ -321,7 +321,8 @@ def roles_dict(path, repo_prefix="", repo_sub_dir=""):
 
     # First scan all directories
     for role in roles:
-        for sub_role in roles_dict(path + "/" + role, repo_prefix="", repo_sub_dir=role + "/"):
+        for sub_role in roles_dict(path + "/" + role, repo_prefix="",
+                                   repo_sub_dir=role + "/"):
             aggregated_roles[role + "/" + sub_role] = role + "/" + sub_role
 
     # Then format them
@@ -333,6 +334,7 @@ def roles_dict(path, repo_prefix="", repo_sub_dir=""):
                 aggregated_roles[role] = role_repo
 
     return aggregated_roles
+
 
 def role_name(role):
     """
