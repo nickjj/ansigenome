@@ -1,7 +1,6 @@
 import os
 import random
 import sys
-import re
 
 import constants as c
 import ui as ui
@@ -124,8 +123,8 @@ digraph role_dependencies {
                 color_length = len(adjusted_colors) - 1
 
             random_index = random.randint(1, color_length)
-            roles_list += "        role_{0}              [label = \"{1}\"]\n" \
-                          .format(re.sub(r'[.-/]', '_', name), name)
+            roles_list += '        "{0}"              [label = "{1}"]\n' \
+                          .format(name, name)
 
             edge = '\n        edge [color = "{0}"];\n' \
                    .format(adjusted_colors[random_index])
@@ -136,13 +135,8 @@ digraph role_dependencies {
 
                 for dependency in sorted(fields["dependencies"]):
                     dependency_name = utils.role_name(dependency)
-                    dependencies += "        role_{0} -> role_{1}\n".format(
-                        re.sub(r'[.-/]', '_', name),
-                        re.sub(r'[.-/]', '_',
-                               utils.normalize_role(dependency_name,
-                                                    self.config)
-                               )
-                    )
+                    dependencies += '        "{0}" -> "{1}"\n' \
+                                    .format(name, dependency_name)
 
                 edges += "{0}{1}\n".format(edge, dependencies)
 
@@ -173,8 +167,8 @@ digraph role_dependencies {
         cli_flags += "-o {0}".format(self.out_file)
 
         (out, err) = utils.capture_shell(
-            "ansigenome export -t graph -f dot | dot -Tpng {0}"
-            .format(cli_flags))
+            "ansigenome {0} export -t graph -f dot | dot -Tpng {1}"
+            .format(self.roles_path, cli_flags))
 
         if err:
             ui.error(err)

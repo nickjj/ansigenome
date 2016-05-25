@@ -340,9 +340,6 @@ def role_name(role):
     """
     Return the role name from a folder name.
     """
-    if "." in role:
-        return role.split(".")[1]
-
     return role
 
 
@@ -373,18 +370,7 @@ def normalize_role(role, config):
     """
     Normalize a role name.
     """
-    if role.startswith(config["scm_repo_prefix"]):
-        role_name = role.replace(config["scm_repo_prefix"], "")
-    else:
-        if "." in role:
-            galaxy_prefix = "{0}.".format(config["scm_user"])
-            role_name = role.replace(galaxy_prefix, "")
-        elif "-" in role:
-            role_name = role.replace("-", "_")
-        else:
-            role_name = role
-
-    return role_name
+    return role
 
 
 def create_meta_main(create_path, config, role, categories):
