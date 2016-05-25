@@ -166,8 +166,8 @@ digraph role_dependencies {
         cli_flags += "-o {0}".format(self.out_file)
 
         (out, err) = utils.capture_shell(
-            "ansigenome export -t graph -f dot | dot -Tpng {0}"
-            .format(cli_flags))
+            "ansigenome {0} export -t graph -f dot | dot -Tpng {1}"
+            .format(self.roles_path, cli_flags))
 
         if err:
             ui.error(err)
