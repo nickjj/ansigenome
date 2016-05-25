@@ -1,7 +1,6 @@
 import os
 import random
 import sys
-import re
 
 import constants as c
 import ui as ui
@@ -124,7 +123,8 @@ digraph role_dependencies {
                 color_length = len(adjusted_colors) - 1
 
             random_index = random.randint(1, color_length)
-            roles_list += '        "{0}"              [label = "{1}"]\n'.format(name, name)
+            roles_list += '        "{0}"              [label = "{1}"]\n' \
+                          .format(name, name)
 
             edge = '\n        edge [color = "{0}"];\n' \
                    .format(adjusted_colors[random_index])
@@ -135,7 +135,8 @@ digraph role_dependencies {
 
                 for dependency in sorted(fields["dependencies"]):
                     dependency_name = utils.role_name(dependency)
-                    dependencies += '        "{0}" -> "{1}"\n'.format(name, dependency_name)
+                    dependencies += '        "{0}" -> "{1}"\n' \
+                                    .format(name, dependency_name)
 
                 edges += "{0}{1}\n".format(edge, dependencies)
 
