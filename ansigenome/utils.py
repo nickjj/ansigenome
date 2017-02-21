@@ -212,9 +212,9 @@ def yaml_load(path, input="", err_quit=False):
     """
     try:
         if len(input) > 0:
-            return yaml.load(input)
+            return yaml.safe_load(input)
         elif len(path) > 0:
-            return yaml.load(file_to_string(path))
+            return yaml.safe_load(file_to_string(path))
     except Exception as err:
         file = os.path.basename(path)
         ui.error("",
