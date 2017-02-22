@@ -56,5 +56,6 @@ class TestScan(unittest.TestCase):
 
         self.assertEqual(err, "")
 
+
 if __name__ == "__main__":
     unittest.main()
