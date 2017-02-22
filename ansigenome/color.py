@@ -16,6 +16,7 @@ def has_colors(stream):
     except:
         return False
 
+
 has_colors = has_colors(sys.stdout)
 
 # BEGIN PRETTY

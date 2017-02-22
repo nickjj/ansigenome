@@ -91,5 +91,6 @@ class TestGendoc(unittest.TestCase):
 
         assert err == "", "expected empty err but got:\n{0}".format(err)
 
+
 if __name__ == "__main__":
     unittest.main()

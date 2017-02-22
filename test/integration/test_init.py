@@ -69,5 +69,6 @@ class TestInit(unittest.TestCase):
         self.assertEqual(out, "")
         self.assertEqual(err, "")
 
+
 if __name__ == "__main__":
     unittest.main()

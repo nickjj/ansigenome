@@ -34,5 +34,6 @@ class TestRun(unittest.TestCase):
         self.assertIn(run_output, out)
         self.assertEqual(err, "")
 
+
 if __name__ == "__main__":
     unittest.main()
