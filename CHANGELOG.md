@@ -1,3 +1,9 @@
+## v0.6.0
+
+- Fix code execution vulnerability by using `yaml.safe_load` instead of `yaml.load` (thanks @ypid)
+- Support for scanning roles that have sub-directories (thanks @Yannig)
+- Add `ansigenome_info.status` template variable (thanks @ypid)
+
 ## v0.5.6
 
 - Fixed `Warning: <stdin>: syntax error in line XX near '-'` error https://github.com/davidlind/ansigenome/commit/a5294e139c4926df627f05cc8bcae86806e85b4c
